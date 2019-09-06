@@ -25,7 +25,7 @@ bool LAPPDFindPeak::Initialise(std::string configfile, DataModel &data){
 
 bool LAPPDFindPeak::Execute(){
 
-  //std::cout<<"in FindPeak"<<std::endl;
+  std::cout<<"in FindPeak"<<std::endl;
   //Waveform<double> bwav;
   //m_data->Stores["ANNIEEvent"]->Print();
   //bool testval =  m_data->Stores["ANNIEEvent"]->Get("LAPPDtrace",bwav);
@@ -33,17 +33,20 @@ bool LAPPDFindPeak::Execute(){
   //std::cout<<"In Peak Finding Tool..............................."<<std::endl;
 
   // get raw lappd data
-  std::map<int,vector<Waveform<double>>> rawlappddata;
+  std::map<unsigned long,vector<Waveform<double>>> rawlappddata;
   m_data->Stores["ANNIEEvent"]->Get(PeakInputWavLabel,rawlappddata);
   //bool testval =  m_data->Stores["ANNIEEvent"]->Get("RawLAPPDData",rawlappddata);
+  cout<<PeakInputWavLabel<<" "<<rawlappddata.size()<<endl;
 
   // make reconstructed pulses
-  std::map<int,vector<LAPPDPulse>> SimpleRecoLAPPDPulses;
+  std::map<unsigned long,vector<LAPPDPulse>> SimpleRecoLAPPDPulses;
 
-  map <int, vector<Waveform<double>>> :: iterator itr;
+  map <unsigned long, vector<Waveform<double>>> :: iterator itr;
   for (itr = rawlappddata.begin(); itr != rawlappddata.end(); ++itr){
-    int channelno = itr->first;
+    unsigned long channelno = itr->first;
     vector<Waveform<double>> Vwavs = itr->second;
+
+    cout<<"channel= "<<channelno<<endl;
 
     //loop over all Waveforms
     std::vector<LAPPDPulse> thepulses;
@@ -60,7 +63,7 @@ bool LAPPDFindPeak::Execute(){
         std::cout<<" "<<std::endl;
         */
     }
-    SimpleRecoLAPPDPulses.insert(pair <int,vector<LAPPDPulse>> (channelno,thepulses));
+    SimpleRecoLAPPDPulses.insert(pair <unsigned long,vector<LAPPDPulse>> (channelno,thepulses));
 
   }
 
@@ -140,6 +143,7 @@ std::vector<LAPPDPulse> LAPPDFindPeak::FindPulses_TOT(std::vector<double> *theWa
 			else {
         npeaks++; length = 0; hi=(double)i;
         LAPPDPulse apulse(0,0,tc,Q,peak,low,hi);
+        cout<<"pulse parameters:  t="<<tc<<" Q="<<Q<<" peak="<<peak<<" low="<<low<<" hi="<<hi<<endl;
         thepulses.push_back(apulse);
         pulsestarted=false;
         peak=0; Q=0; low=0; hi=0;
