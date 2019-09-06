@@ -46,6 +46,8 @@ bool LAPPDSim::Initialise(std::string configfile, DataModel &data)
 	outputFile = outputFile + "00.root";
 
 	//Get the Geometry information
+	cout<<"OK, getting geometry"<<endl;
+
 	bool testgeom = m_data->Stores["ANNIEEvent"]->Header->Get("AnnieGeometry", _geom);
 	if (not testgeom)
 	{
@@ -59,12 +61,19 @@ bool LAPPDSim::Initialise(std::string configfile, DataModel &data)
 
 	// initialize the ROOT random number generator
 	myTR = new TRandom3();
+
+	cout<<pulsecharacteristicsFileChar<<endl;
 	_tf = new TFile(pulsecharacteristicsFileChar, "READ");
+
+	cout<<"Done opening"<<endl;
 
 	if (_display_config > 0)
 	{
 		_display = new LAPPDDisplay(outputFile, _display_config);
 	}
+
+	cout<<"Done initializing"<<endl;
+
 	return true;
 }
 
@@ -177,7 +186,9 @@ bool LAPPDSim::Execute()
 		LAPPDWaveforms = new std::map<unsigned long, Waveform<double> >;
 		LAPPDWaveforms->clear();
 		// get the MC Hits
-		std::map<unsigned long, std::vector<MCLAPPDHit> >* lappdmchits;
+		//std::map<unsigned long, std::vector<MCLAPPDHit> >* lappdmchits;
+		std::map<unsigned long, std::vector<MCLAPPDHit> > lappdmchits;
+
 		bool testval = m_data->Stores["ANNIEEvent"]->Get("MCLAPPDHits", lappdmchits);
 		if (not testval)
 		{
@@ -187,7 +198,8 @@ bool LAPPDSim::Execute()
 
 		// loop over the number of lappds
 		std::map<unsigned long, std::vector<MCLAPPDHit> >::iterator itr;
-		for (itr = lappdmchits->begin(); itr != lappdmchits->end(); ++itr)
+		//for (itr = lappdmchits->begin(); itr != lappdmchits->end(); ++itr)
+		for (itr = lappdmchits.begin(); itr != lappdmchits.end(); ++itr)
 		{
 			//Get the Channelkey
 			unsigned long tubeno = itr->first;
@@ -222,6 +234,7 @@ bool LAPPDSim::Execute()
 				double trans = localpos.at(1) * 1000;
 				double para = localpos.at(0) * 1000;
 				//Add the traces to retrieve them later
+
 				response.AddSinglePhotonTrace(trans, para, atime);
 			}
 
@@ -240,6 +253,8 @@ bool LAPPDSim::Execute()
 				Vwavs.push_back(awav);
 			}
 
+			cout<<"Done filling Wavs "<<Vwavs.size()<<endl;
+
 			//Get the channels of each LAPPD
 			std::map<unsigned long, Channel>* lappdchannel = thelappd->GetChannels();
 			int numberOfLAPPDChannels = lappdchannel->size();
@@ -251,6 +266,7 @@ bool LAPPDSim::Execute()
 				//achannel->Print();
 				//This assignment uses the following numbering scheme:
 				//Channelkey 0-29 is the one side, Channelkey 30-59 is the other side in a way that 0 is the left side of the strip, where 30 denotes the right side.
+				cout<<"LAPPDnumerology: "<<achannel.GetChannelID()<<" "<<achannel.GetStripNum()<<" "<<numberOfLAPPDChannels<<endl;
 				if (achannel.GetStripSide() == 0)
 				{
 					LAPPDWaveforms->insert(pair<unsigned long, Waveform<double>>(achannel.GetChannelID(), Vwavs[achannel.GetStripNum()]));
@@ -290,8 +306,7 @@ bool LAPPDSim::Execute()
 	//since there won't be any hit information in the MCHits or MCLAPPDHits
 	if(!_is_artificial)
 	{
-		std::cout << "Saving waveforms to store" << std::endl;
-
+		std::cout << "Saving waveforms to store " << LAPPDWaveforms->size()<< std::endl;
 		m_data->Stores.at("ANNIEEvent")->Set("LAPPDWaveforms", LAPPDWaveforms, true);
 	}
 	_event_counter++;
@@ -301,7 +316,9 @@ bool LAPPDSim::Execute()
 
 bool LAPPDSim::Finalise()
 {
+	cout<<"about to finalize yo"<<endl;
 	_tf->Close();
-	_display->~LAPPDDisplay();
+	cout<<"display crap"<<endl;
+	if(_display_config>0) _display->~LAPPDDisplay();
 	return true;
 }
