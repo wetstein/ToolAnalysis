@@ -36,17 +36,18 @@ bool LAPPDFindPeak::Execute(){
   std::map<unsigned long,vector<Waveform<double>>> rawlappddata;
   m_data->Stores["ANNIEEvent"]->Get(PeakInputWavLabel,rawlappddata);
   //bool testval =  m_data->Stores["ANNIEEvent"]->Get("RawLAPPDData",rawlappddata);
-  cout<<PeakInputWavLabel<<" "<<rawlappddata.size()<<endl;
+  //cout<<PeakInputWavLabel<<" "<<rawlappddata.size()<<endl;
 
   // make reconstructed pulses
   std::map<unsigned long,vector<LAPPDPulse>> SimpleRecoLAPPDPulses;
 
   map <unsigned long, vector<Waveform<double>>> :: iterator itr;
+
   for (itr = rawlappddata.begin(); itr != rawlappddata.end(); ++itr){
     unsigned long channelno = itr->first;
     vector<Waveform<double>> Vwavs = itr->second;
 
-    cout<<"channel= "<<channelno<<endl;
+    //cout<<"channel= "<<channelno<<endl;
 
     //loop over all Waveforms
     std::vector<LAPPDPulse> thepulses;
@@ -54,6 +55,7 @@ bool LAPPDFindPeak::Execute(){
 
         Waveform<double> bwav = Vwavs.at(i);
         thepulses = FindPulses_TOT(bwav.GetSamples());
+
         /*
         std::cout<<"The number of peaks for channel "<<channelno
                  <<", wavform "<<i<<" is: "<<thepulses.size()<<"   ";
@@ -127,6 +129,9 @@ std::vector<LAPPDPulse> LAPPDFindPeak::FindPulses_TOT(std::vector<double> *theWa
 	int length = 0;
 	int MinimumTotBin = (int)(MinimumTot/Deltat);
   //std::cout<<"Min Tot Bin: "<<MinimumTotBin<<std::endl;
+
+  //cout<<"findpulsesTOT parameters: "<<TotThreshold<<" "<<MinimumTotBin<<" "<<nbin<<endl;
+
 	for(int i=0;i<nbin;i++) {
 		pvol = TMath::Abs(theWav->at(i));
     if(i>1) ppre = TMath::Abs(theWav->at(i-1));
