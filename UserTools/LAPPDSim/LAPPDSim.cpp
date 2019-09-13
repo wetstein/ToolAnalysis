@@ -183,7 +183,7 @@ bool LAPPDSim::Execute()
 	else
 	{
 		//storage for the waveforms
-		LAPPDWaveforms = new std::map<unsigned long, Waveform<double> >;
+		LAPPDWaveforms = new std::map<unsigned long, vector<Waveform<double> > >;
 		LAPPDWaveforms->clear();
 		// get the MC Hits
 		//std::map<unsigned long, std::vector<MCLAPPDHit> >* lappdmchits;
@@ -202,11 +202,15 @@ bool LAPPDSim::Execute()
 		for (itr = lappdmchits.begin(); itr != lappdmchits.end(); ++itr)
 		{
 			//Get the Channelkey
-			unsigned long tubeno = itr->first;
+	// NOOOOOOO!!!!
+	//		unsigned long tubeno = itr->first;
 
 			//Retrieve the detector object with the Channelkey
-			Detector* thelappd = _geom->ChannelToDetector(tubeno);
-
+//			Detector* thelappd = _geom->ChannelToDetector(tubeno);
+			Detector* thelappd = _geom->ChannelToDetector(1000);
+			std::map<unsigned long, Channel>* lappdchannel = thelappd->GetChannels();
+		  int numberOfLAPPDChannels = lappdchannel->size();
+		  cout<<"w00T: "<<numberOfLAPPDChannels<<endl;
 			//Use the detector object to get the detector ID
 			unsigned long actualTubeNo = thelappd->GetDetectorID();
 
@@ -256,8 +260,8 @@ bool LAPPDSim::Execute()
 			cout<<"Done filling Wavs "<<Vwavs.size()<<endl;
 
 			//Get the channels of each LAPPD
-			std::map<unsigned long, Channel>* lappdchannel = thelappd->GetChannels();
-			int numberOfLAPPDChannels = lappdchannel->size();
+			//std::map<unsigned long, Channel>* lappdchannel = thelappd->GetChannels();
+			//int numberOfLAPPDChannels = lappdchannel->size();
 			std::map<unsigned long, Channel>::iterator chitr;
 			//Loop over all channels for the assignment of the waveforms to the channels for storing the waveforms
 			for (chitr = lappdchannel->begin(); chitr != lappdchannel->end(); ++chitr)
@@ -266,14 +270,19 @@ bool LAPPDSim::Execute()
 				//achannel->Print();
 				//This assignment uses the following numbering scheme:
 				//Channelkey 0-29 is the one side, Channelkey 30-59 is the other side in a way that 0 is the left side of the strip, where 30 denotes the right side.
-				cout<<"LAPPDnumerology: "<<achannel.GetChannelID()<<" "<<achannel.GetStripNum()<<" "<<numberOfLAPPDChannels<<endl;
+				//cout<<"LAPPDnumerology: "<<achannel.GetChannelID()<<" "<<achannel.GetStripNum()<<" "<<numberOfLAPPDChannels<<endl;
+
 				if (achannel.GetStripSide() == 0)
 				{
-					LAPPDWaveforms->insert(pair<unsigned long, Waveform<double>>(achannel.GetChannelID(), Vwavs[achannel.GetStripNum()]));
+					vector<Waveform<double>> aWav;
+					aWav.push_back(Vwavs[achannel.GetStripNum()]);
+					LAPPDWaveforms->insert(pair<unsigned long, vector<Waveform<double>>>(achannel.GetChannelID(),aWav));
 				}
 				else
 				{
-					LAPPDWaveforms->insert(pair<unsigned long, Waveform<double>>(achannel.GetChannelID(), Vwavs[numberOfLAPPDChannels - achannel.GetStripNum() - 1]));
+					vector<Waveform<double>> aWav;
+					aWav.push_back(Vwavs[numberOfLAPPDChannels - achannel.GetStripNum() - 1]);
+					LAPPDWaveforms->insert(pair<unsigned long, vector<Waveform<double>>>(achannel.GetChannelID(),aWav));
 				}
 
 			}
@@ -316,9 +325,7 @@ bool LAPPDSim::Execute()
 
 bool LAPPDSim::Finalise()
 {
-	cout<<"about to finalize yo"<<endl;
 	_tf->Close();
-	cout<<"display crap"<<endl;
 	if(_display_config>0) _display->~LAPPDDisplay();
 	return true;
 }
