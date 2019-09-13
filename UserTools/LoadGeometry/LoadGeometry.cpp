@@ -662,7 +662,7 @@ bool LoadGeometry::ParseLAPPDDataEntry(std::vector<std::string> SpecLine,
   else{
   std::cerr << "The chosen channel status isn't available!!!" << std::endl;
       }
-  Channel lappdchannel(464+channel_num,
+  Channel lappdchannel(1000+channel_num,
                       Position(channel_position_x,
                                channel_position_y,
                                channel_position_z),
