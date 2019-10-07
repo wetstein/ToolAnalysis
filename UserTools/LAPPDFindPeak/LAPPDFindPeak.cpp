@@ -65,8 +65,10 @@ bool LAPPDFindPeak::Execute(){
         std::cout<<" "<<std::endl;
         */
     }
-    SimpleRecoLAPPDPulses.insert(pair <unsigned long,vector<LAPPDPulse>> (channelno,thepulses));
-
+    if(thepulses.size()>0)
+      {
+        SimpleRecoLAPPDPulses.insert(pair <unsigned long,vector<LAPPDPulse>> (channelno,thepulses));
+      }       
   }
 
   m_data->Stores["ANNIEEvent"]->Set("SimpleRecoLAPPDPulses",SimpleRecoLAPPDPulses);
