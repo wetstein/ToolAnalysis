@@ -79,6 +79,7 @@ bool LAPPDSim::Initialise(std::string configfile, DataModel &data)
 
 bool LAPPDSim::Execute()
 {
+
 	std::cout << "Executing LAPPDSim; event counter " << _event_counter << std::endl;
 
 	//The files become too large, if one tries to save all WCSim events into one file.

@@ -94,5 +94,8 @@ if (tool=="MonitorTankLive") ret=new MonitorTankLive;
 if (tool=="MonitorTankTime") ret=new MonitorTankTime;
 if (tool=="PhaseIIADCCalibrator") ret=new PhaseIIADCCalibrator;
 if (tool=="MCHitToHitComparer") ret=new MCHitToHitComparer;
+if (tool=="ClusterTree") ret=new ClusterTree;
+if (tool=="ClusterDummy") ret=new ClusterDummy;
+if (tool=="LAPPDCluster") ret=new LAPPDCluster;
 return ret;
 }

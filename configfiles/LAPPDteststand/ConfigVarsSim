@@ -2,7 +2,7 @@
 nhits 4
 PathToPulsecharacteristics ./UserTools/LAPPDSim/pulsecharacteristics.root
 ArtificialEvent 0
-EventDisplay 1
+EventDisplay 0
 OutputFile testtestestest
 # in units of meters
 paracoord -0.001

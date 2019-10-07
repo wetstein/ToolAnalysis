@@ -102,3 +102,6 @@
 #include "MonitorTankTime.h"
 #include "PhaseIIADCCalibrator.h"
 #include "MCHitToHitComparer.h"
+#include "ClusterTree.h"
+#include "ClusterDummy.h"
+#include "LAPPDCluster.h"
