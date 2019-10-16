@@ -21,27 +21,25 @@ bool LAPPDCluster::Initialise(std::string configfile, DataModel &data){
 
 bool LAPPDCluster::Execute(){
 
-  cout<<"executing lappdcluster!!!"<<endl;
+  //cout<<"executing lappdcluster!!!"<<endl;
 
   std::map <unsigned long, vector<LAPPDPulse>> SimpleRecoLAPPDPulses;
   m_data->Stores["ANNIEEvent"]->Get("SimpleRecoLAPPDPulses",SimpleRecoLAPPDPulses);
   std::map <unsigned long, vector<LAPPDPulse>> :: iterator pulseitr;
 
 
-  cout<<"Grabbed RecoLAPPDPulses "<<SimpleRecoLAPPDPulses.size()<<endl;
+  //cout<<"Grabbed RecoLAPPDPulses "<<SimpleRecoLAPPDPulses.size()<<endl;
 
   vector<unsigned long> chanhand;
   std::map <unsigned long, vector<LAPPDHit>> Hits;
 
 
-  for (pulseitr = SimpleRecoLAPPDPulses.begin(); pulseitr != SimpleRecoLAPPDPulses.end(); ++pulseitr){
-    cout<< pulseitr->first << " " << endl;
-  }
-  cout<<"!!!That is all pulses we have!!!"<<endl;
+
+  //cout<<"!!!That is all pulses we have!!!"<<endl;
   for (pulseitr = SimpleRecoLAPPDPulses.begin(); pulseitr != SimpleRecoLAPPDPulses.end(); ++pulseitr){
     vector<LAPPDHit> thehits;
     vector<double> localposition;
-    double ParaPosition;
+    double ParaPosition=-555;
     double PerpPosition;
 
     unsigned long chankey = pulseitr->first;
@@ -57,7 +55,7 @@ bool LAPPDCluster::Execute(){
       }
       if (handled)
       {
-        cout<<chankey<<" is looped."<<endl;
+        //cout<<chankey<<" is looped."<<endl;
         break;
       }
 
@@ -65,7 +63,7 @@ bool LAPPDCluster::Execute(){
 
     vector<LAPPDPulse> vPulse = pulseitr->second;
 
-    cout<<"iterating!!!   "<<chankey<<" "<<vPulse.size()<<endl;
+    //cout<<"iterating!!!   "<<chankey<<" "<<vPulse.size()<<endl;
 
     if(vPulse.size()>1) {cout<<"VPULSE HAS A SIZE OF: "<<vPulse.size()<<endl;}
     for(int jj=0; jj<vPulse.size(); jj++){
@@ -90,43 +88,49 @@ bool LAPPDCluster::Execute(){
       int mystripnum = mychannel->GetStripNum();
       int oppostripnum = oppochannel->GetStripNum();
 
-      //cout<<"mystripnum is "<<mystripnum<<endl;
-      //cout<<"oppostripnum is "<<oppostripnum<<endl;
+      cout<<"mystripnum is "<<mystripnum<<endl;
+      cout<<"oppostripnum is "<<oppostripnum<<endl;
 
 
 
       if( (oppochankey != chankey) && (mystripnum == oppostripnum) ){
         cout<<"channel "<<chankey<<" and "<<oppochankey<<" are on the same strip."<<endl;
         cPulse.insert(pair <unsigned long,LAPPDPulse> (chankey,vPulse.at(0)));
-        cPulse.insert(pair <unsigned long,LAPPDPulse> (chankey,oppovPulse.at(0)));
+        cPulse.insert(pair <unsigned long,LAPPDPulse> (oppochankey,oppovPulse.at(0)));
         chanhand.push_back(oppochankey);
       }
       if ( (oppochankey != chankey) && (std::abs(oppostripnum-mystripnum)==1) ){
         if (mychannel->GetStripSide() == oppochannel->GetStripSide()){
           cout<<"channel "<<chankey<<" and "<<oppochankey<<" are on the same sides of adjacent strips."<<endl;
-          cPulse.insert(pair <unsigned long,LAPPDPulse> (chankey,oppovPulse.at(0)));
+          cPulse.insert(pair <unsigned long,LAPPDPulse> (oppochankey,oppovPulse.at(0)));
           chanhand.push_back(oppochankey);
         }
         else {
           cout<<"channel "<<chankey<<" and "<<oppochankey<<" are on the opposite sides of adjacent strips."<<endl;
-          cPulse.insert(pair <unsigned long,LAPPDPulse> (chankey,oppovPulse.at(0)));
+          cPulse.insert(pair <unsigned long,LAPPDPulse> (oppochankey,oppovPulse.at(0)));
           chanhand.push_back(oppochankey);
         }
       }
     }
 
     //Finding the Maxpulse
-    cout<<"Finding Maxpulse!!!"<<endl;
+    //cout<<"Finding Maxpulse!!!"<<endl;
     double maxcharge = 0;
     unsigned long maxchankey=0;
     LAPPDPulse maxpulse;
 
     std::map<unsigned long , LAPPDPulse> :: iterator itr;
+    cout<<"What is in cPulse???"<<endl;
+    for (itr = cPulse.begin(); itr != cPulse.end(); ++itr){
+      cout<< pulseitr->first <<endl;
+    }
+
     for (itr = cPulse.begin(); itr != cPulse.end(); ++itr){
       unsigned long mychankey = itr->first;
       LAPPDPulse mypulse = itr->second;
-      cout<<"!!!mychankey is "<<mychankey<<" !!!"<<endl;
+      //cout<<"!!!mychankey is "<<mychankey<<" !!!"<<endl;
       if (maxcharge>mypulse.GetCharge()){
+        cout<<"maxcharge "<<mypulse.GetCharge()<<endl;
         maxchankey = mychankey;
         maxpulse = mypulse;
       }
@@ -143,8 +147,12 @@ bool LAPPDCluster::Execute(){
       unsigned long thechankey = itr->first;
       LAPPDPulse mypulse = itr->second;
 
-      Channel* mychannel= _geom->GetChannel(thechankey);
+      Channel* mychannel = _geom->GetChannel(thechankey);
+      cout<<"thechankey "<<thechankey<<" maxchankey "<<maxchankey<<endl;
+      cout<<"MYStrip "<<mychannel->GetStripNum()<<" MAXStrip "<<maxchannel->GetStripNum()<<endl;
+      cout<<" "<<endl;
       if( (thechankey != maxchankey) && (mychannel->GetStripNum() == maxchannel->GetStripNum())){
+        cout<<"WERTWER "<<maxpulse.GetTime()<<" "<<mypulse.GetTime()<<endl;
         ParaPosition = (maxpulse.GetTime()*1000. - mypulse.GetTime()*1000.) * 29.98;
       }
       if( (thechankey != maxchankey) && (abs(mychannel->GetStripNum() - maxchannel->GetStripNum()) == 1) && (mychannel->GetStripSide() == maxchannel->GetStripSide()) ) {
@@ -184,7 +192,7 @@ bool LAPPDCluster::Execute(){
     thehits.push_back(myhit);
     Hits.insert(pair <unsigned long,vector<LAPPDHit>> (chankey,thehits));
     chanhand.push_back(chankey);
-    cout<< "HANDLED" << endl;
+    //cout<< "HANDLED" << endl;
 
 
 
