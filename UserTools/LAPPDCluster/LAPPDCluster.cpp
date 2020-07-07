@@ -13,11 +13,12 @@ bool LAPPDCluster::Initialise(std::string configfile, DataModel &data){
   /////////////////////////////////////////////////////////////////
 
   m_data->Stores["ANNIEEvent"]->Header->Get("AnnieGeometry", _geom);
-
+    //cout<<"loaded Geom"<<endl;
   TString CL;
   m_variables.Get("ClusterLabel",CL);
+    cout<<"GKLDAJGAFSFD"<<CL<<endl;
   ClusterLabel = CL;
-
+    cout<<ClusterLabel<<endl;
 
   return true;
 }
@@ -28,7 +29,9 @@ bool LAPPDCluster::Execute(){
   //cout<<"executing lappdcluster!!!"<<endl;
 
   std::map <unsigned long, vector<LAPPDPulse>> SimpleRecoLAPPDPulses;
+    cout<< "ClusterLabel  "<<ClusterLabel<<endl;
   m_data->Stores["ANNIEEvent"]->Get(ClusterLabel,SimpleRecoLAPPDPulses);
+    cout<<SimpleRecoLAPPDPulses.size()<<endl;
   //m_data->Stores["ANNIEEvent"]->Get("SimpleRecoLAPPDPulses",SimpleRecoLAPPDPulses);
   //  cout<<"We got "<< SimpleRecoLAPPDPulses.size()<< " Pulses" << endl;
   std::map <unsigned long, vector<LAPPDPulse>> :: iterator pulseitr;
@@ -231,11 +234,12 @@ bool LAPPDCluster::Execute(){
     thehits.push_back(myhit);
     Hits.insert(pair <unsigned long,vector<LAPPDHit>> (chankey,thehits));
     chanhand.push_back(chankey);
-    //cout<< "HANDLED" << endl;
+    cout<< "HANDLED" << endl;
 
 
 
   }
+    cout << "In LAPPDCluster: " << Hits.size()<< endl;
   m_data->Stores["ANNIEEvent"]->Set("Clusters",Hits);
   return true;
 }

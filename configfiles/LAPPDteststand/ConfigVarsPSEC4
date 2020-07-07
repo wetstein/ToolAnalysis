@@ -42,3 +42,6 @@ path ./testoutput
 outfile ../LAPPDoutputs/SimTest.root
 #outfile ./testout.root
 NHistos 100
+
+#LAPPDCluster
+ClusterLabel SimpleRecoLAPPDPulses

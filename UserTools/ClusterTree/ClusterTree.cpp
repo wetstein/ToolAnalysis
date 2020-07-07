@@ -33,12 +33,13 @@ bool ClusterTree::Initialise(std::string configfile, DataModel &data)
 
 bool ClusterTree::Execute()
 {
+ // cout<<"Cluster Tree Execute"<<endl;
   nottf->cd();
   std::map<unsigned long,vector<LAPPDHit>> Hits;
   m_data->Stores["ANNIEEvent"]->Get("Clusters",Hits);
   map <unsigned long, vector<LAPPDHit>> :: iterator itr;
   vector<LAPPDHit> :: iterator itrr;
-//  cout<<"SETUP COMPLETE"<< endl;
+   // cout<<"SETUP COMPLETE  HELLO  "<< Hits.size() << endl;
 
   for (itr = Hits.begin(); itr != Hits.end(); ++itr)
     {
@@ -49,28 +50,29 @@ bool ClusterTree::Execute()
       NHits = numberhits;
       int m=0;
       for (itrr = itr->second.begin(); itrr!= itr->second.end(); ++itrr)
-	{
-	  //cout<<"GETTING INFO"<<endl;
-	  hT[m]=hitvect[m].GetTime();
-	 //  cout<<"GETTING INFO"<<endl;
-	  hQ[m]=hitvect[m].GetCharge();
-	//  cout<<"GETTING INFO"<<endl;
-	  vector<double> time;
-	  if(time.size()>0)
-	    {
-	      time=hitvect[m].GetLocalPosition();
-	      hxpar[m]=time[0];
-	//      cout<<"GETTING INFO"<<endl;
-	      hxperp[m]=time[1];
-	    }
-	//    cout<<"GETTING INFO"<<endl;
-	    htime[m]=hitvect[m].GetTime();
-	  m++;
-	}
-  //    cout<<"FILLING TREE WITH HITS"<<endl;      
-      fMyTree->Fill();
+      {
+          //cout<<"GETTING INFO"<<endl;
+          hT[m]=hitvect[m].GetTime();
+          //  cout<<"GETTING INFO"<<endl;
+          hQ[m]=hitvect[m].GetCharge();
+          //  cout<<"GETTING INFO"<<endl;
+          vector<double> time;
+          if(time.size()>0)
+          {
+              time=hitvect[m].GetLocalPosition();
+              hxpar[m]=time[0];
+              //      cout<<"GETTING INFO"<<endl;
+              hxperp[m]=time[1];
+          }
+          //    cout<<"GETTING INFO"<<endl;
+          htime[m]=hitvect[m].GetTime();
+          m++;
+      }
+    cout<<"FILLING TREE WITH HITS"<<endl;
+    fMyTree->Fill();
 
     }
+    //cout<<"Is this working? 2"<<endl;
 
   return true;
 }

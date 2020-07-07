@@ -589,8 +589,14 @@ bool LoadGeometry::ParseLAPPDDataEntry(std::vector<std::string> SpecLine,
     }
     //Integers
     if (LAPPDLegendEntries.at(i) == "detector_num") detector_num = ivalue;
-    if (LAPPDLegendEntries.at(i) == "channel_strip_side") {channel_strip_side = ivalue; cout<< "EEEEEEEEEEEEEEEEEEEEEEE" <<channel_strip_side<<endl;}
-    if (LAPPDLegendEntries.at(i) == "channel_strip_num") {channel_strip_num = ivalue; cout<< "SDFGSDFGSDFGSDFGSDFGSDFGSDFGSDF " << channel_strip_num<<endl;}
+    if (LAPPDLegendEntries.at(i) == "channel_strip_side") {
+        channel_strip_side = ivalue;
+        //cout<< "EEEEEEEEEEEEEEEEEEEEEEE" <<channel_strip_side<<endl;
+    }
+    if (LAPPDLegendEntries.at(i) == "channel_strip_num") {
+        channel_strip_num = ivalue;
+        //cout<< "SDFGSDFGSDFGSDFGSDFGSDFGSDFGSDF " << channel_strip_num<<endl;
+    }
 
     //Unsigned Integers
     if (LAPPDLegendEntries.at(i) == "channel_signal_crate") channel_signal_crate = uivalue;

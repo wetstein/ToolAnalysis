@@ -1,5 +1,5 @@
 #GenerateHits
-nhits 4
+nhits 3
 PathToPulsecharacteristics ./UserTools/LAPPDSim/pulsecharacteristics.root
 ArtificialEvent 0
 EventDisplay 0
