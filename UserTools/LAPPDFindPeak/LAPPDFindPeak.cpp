@@ -122,39 +122,39 @@ std::vector<LAPPDPulse> LAPPDFindPeak::FindPulses_TOT(std::vector<double> *theWa
   double low=0.;
   double hi=0.;
   double tc=0;
-
   bool pulsestarted=false;
-	double threshold = TotThreshold*2;
-	double pvol = 0, vollast = 0;
+  double threshold = TotThreshold*2;
+  double pvol = 0, vollast = 0;
   double ppre = 0;
-	int nbin = theWav->size();
-	int length = 0;
-	int MinimumTotBin = (int)(MinimumTot/Deltat);
+  int nbin = theWav->size();
+  int length = 0;
+  int MinimumTotBin = (int)(MinimumTot/Deltat);
   //std::cout<<"Min Tot Bin: "<<MinimumTotBin<<std::endl;
 
   //cout<<"findpulsesTOT parameters: "<<TotThreshold<<" "<<MinimumTotBin<<" "<<nbin<<endl;
 
 	for(int i=0;i<nbin;i++) {
 		pvol = TMath::Abs(theWav->at(i));
-    if(i>1) ppre = TMath::Abs(theWav->at(i-1));
+        if(i>1) ppre = TMath::Abs(theWav->at(i-1));
 
 		if(pvol>threshold) {
-      length++;
-      if(pvol>peak) peak = pvol;
-      Q+=(theWav->at(i));
-      if(!pulsestarted) low=(double)i;
-      pulsestarted=true;
-    }
+            length++;
+            if(pvol>peak) peak = pvol;
+            Q+=(theWav->at(i));
+            if(!pulsestarted) low=(double)i;
+            pulsestarted=true;
+        }
 		else {
 			if(length<MinimumTotBin) {length=0; Q=0; pulsestarted=false; low=0; hi=0; peak=0;}
 			else {
-        npeaks++; length = 0; hi=(double)i;
-        LAPPDPulse apulse(0,0,tc,Q,peak,low,hi);
-        cout<<"pulse parameters:  t="<<tc<<" Q="<<Q<<" peak="<<peak<<" low="<<low<<" hi="<<hi<<endl;
-        thepulses.push_back(apulse);
-        pulsestarted=false;
-        peak=0; Q=0; low=0; hi=0;
-      }
+                npeaks++; length = 0; hi=(double)i;
+                tc= (low * Deltat)/1000.;
+                LAPPDPulse apulse(0,0,tc,Q,peak,low,hi);
+                cout<<"pulse parameters:  t="<<tc<<" Q="<<Q<<" peak="<<peak<<" low="<<low<<" hi="<<hi<<endl;
+                thepulses.push_back(apulse);
+                pulsestarted=false;
+                peak=0; Q=0; low=0; hi=0;
+            }
 		}
 	}
 	return thepulses;

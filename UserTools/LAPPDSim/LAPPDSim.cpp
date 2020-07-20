@@ -86,9 +86,10 @@ bool LAPPDSim::Execute()
 	//Every 100 events get a new file.
 	if(_event_counter == (20 * (_file_number + 1)))
 	{
-		_display->OpenNewFile(_file_number);
+		if (_display_config > 0) _display->OpenNewFile(_file_number);
 		_file_number++;
-	}
+        
+    }
 	//Initialise the histogram for displaying all LAPPDs at once
 	if (_display_config > 0)
 	{
