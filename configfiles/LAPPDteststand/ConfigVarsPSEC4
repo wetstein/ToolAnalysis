@@ -15,7 +15,8 @@ SimInput  ./UserTools/LAPPDSim/pulsecharacteristics.root
 FileInput ../LAPPDdata_fff/LAPPD25_3.22.18/2400_2100_1300_bsln_2sided_root.fff
 
 #LAPPDFilter
-FilterInputWavLabel RawLAPPDData
+#FilterInputWavLabel RawLAPPDData
+FilterInputWavLabel LAPPDWaveforms
 #FilterInputWavLabel BLsubtractedLAPPDData
 doFilter false
 CutoffFrequency 500000000
@@ -25,14 +26,15 @@ IntegLow  64000
 IntegHi 67000
 
 #LAPPDFindPeak
-#PeakInputWavLabel FiltLAPPDData
-PeakInputWavLabel LAPPDWaveforms
+PeakInputWavLabel FiltLAPPDData
+#PeakInputWavLabel LAPPDWaveforms
 TotThreshold 0.5
-MinimumTot 2000.
+MinimumTot 1000.
 Deltat 100.
 
 # LAPPDcfd
 CFDInputWavLabel FiltLAPPDData
+#CFDInputWavLabel LAPPDWaveforms
 Fraction_CFD 0.4
 
 # LAPPDSave
@@ -44,4 +46,5 @@ outfile ../LAPPDoutputs/SimTest.root
 NHistos 100
 
 #LAPPDCluster
-ClusterLabel SimpleRecoLAPPDPulses
+#ClusterLabel SimpleRecoLAPPDPulses
+ClusterLabel CFDRecoLAPPDPulses

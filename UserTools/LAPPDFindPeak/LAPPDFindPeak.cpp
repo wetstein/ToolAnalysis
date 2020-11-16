@@ -36,7 +36,7 @@ bool LAPPDFindPeak::Execute(){
   std::map<unsigned long,vector<Waveform<double>>> rawlappddata;
   m_data->Stores["ANNIEEvent"]->Get(PeakInputWavLabel,rawlappddata);
   //bool testval =  m_data->Stores["ANNIEEvent"]->Get("RawLAPPDData",rawlappddata);
-  //cout<<PeakInputWavLabel<<" "<<rawlappddata.size()<<endl;
+  cout<<PeakInputWavLabel<<" HElp "<<rawlappddata.size()<<endl;
 
   // make reconstructed pulses
   std::map<unsigned long,vector<LAPPDPulse>> SimpleRecoLAPPDPulses;
@@ -47,7 +47,7 @@ bool LAPPDFindPeak::Execute(){
     unsigned long channelno = itr->first;
     vector<Waveform<double>> Vwavs = itr->second;
 
-    //cout<<"channel= "<<channelno<<endl;
+   //cout<<"channel= "<<channelno<<endl;
 
     //loop over all Waveforms
     std::vector<LAPPDPulse> thepulses;
@@ -67,10 +67,11 @@ bool LAPPDFindPeak::Execute(){
     }
     if(thepulses.size()>0)
       {
+          cout<<channelno<<" Channel with pulses in FindPeak"<<endl;
         SimpleRecoLAPPDPulses.insert(pair <unsigned long,vector<LAPPDPulse>> (channelno,thepulses));
       }       
   }
-
+    cout<<SimpleRecoLAPPDPulses.size()<<" In LAPPDFINDPEAK"<<endl;
   m_data->Stores["ANNIEEvent"]->Set("SimpleRecoLAPPDPulses",SimpleRecoLAPPDPulses);
 
   //std::cout<<"Done Finding Peaks..............................."<<std::endl;
@@ -100,7 +101,7 @@ bool LAPPDFindPeak::Execute(){
   m_data->Stores["ANNIEEvent"]->Set("minbin",minbin);
 */
 
-
+    cout<<"End of LAPPDFindPeak"<<endl;
 
   return true;
 }
@@ -138,6 +139,7 @@ std::vector<LAPPDPulse> LAPPDFindPeak::FindPulses_TOT(std::vector<double> *theWa
         if(i>1) ppre = TMath::Abs(theWav->at(i-1));
 
 		if(pvol>threshold) {
+           // cout<<theWav->at(i)<<endl;
             length++;
             if(pvol>peak) peak = pvol;
             Q+=(theWav->at(i));
@@ -145,6 +147,7 @@ std::vector<LAPPDPulse> LAPPDFindPeak::FindPulses_TOT(std::vector<double> *theWa
             pulsestarted=true;
         }
 		else {
+            //if(length>0){cout<<length<<" "<<MinimumTotBin<<endl;}
 			if(length<MinimumTotBin) {length=0; Q=0; pulsestarted=false; low=0; hi=0; peak=0;}
 			else {
                 npeaks++; length = 0; hi=(double)i;

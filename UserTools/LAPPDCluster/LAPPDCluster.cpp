@@ -16,7 +16,7 @@ bool LAPPDCluster::Initialise(std::string configfile, DataModel &data){
     //cout<<"loaded Geom"<<endl;
   TString CL;
   m_variables.Get("ClusterLabel",CL);
-    cout<<"GKLDAJGAFSFD"<<CL<<endl;
+    //cout<<"GKLDAJGAFSFD"<<CL<<endl;
   ClusterLabel = CL;
     cout<<ClusterLabel<<endl;
 
@@ -82,8 +82,7 @@ bool LAPPDCluster::Execute(){
     }
 
     Channel* mychannel= _geom->GetChannel(chankey);
-    //cout<<"the strip number is :"<<mychannel->GetStripNum()<<" and the side is: "<<mychannel->GetStripSide()<<endl;
-
+   // cout<<"the strip number is :"<<mychannel->GetStripNum()<<" and the side is: "<<mychannel->GetStripSide()<<endl;
     std::map<unsigned long , LAPPDPulse> cPulse;
     std::map <unsigned long, vector<LAPPDPulse>> :: iterator oppoitr;
 
@@ -142,7 +141,8 @@ bool LAPPDCluster::Execute(){
       unsigned long mychankey = itr->first;
       LAPPDPulse mypulse = itr->second;
       //cout<<"!!!mychankey is "<<mychankey<<" !!!"<<endl;
-      if (maxcharge>mypulse.GetCharge()){
+      if (maxcharge>mypulse.GetCharge()){ // Pulses are negative
+        maxcharge=mypulse.GetCharge();
         //cout<<"maxcharge "<<mypulse.GetCharge()<<endl;
         maxchankey = mychankey;
         maxpulse = mypulse;
@@ -217,7 +217,7 @@ bool LAPPDCluster::Execute(){
       if(SumBelow>0) {PerpPosition = (SumAbove / SumBelow);}
     }
     else {
-      PerpPosition = maxchannel->GetStripNum();
+      PerpPosition = (double) maxchannel->GetStripNum();
     }
 
     //cout<<"Positions: "<<ParaPosition<<" "<<PerpPosition<<endl;

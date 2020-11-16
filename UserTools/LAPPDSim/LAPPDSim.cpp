@@ -206,11 +206,11 @@ bool LAPPDSim::Execute()
 			//Get the Channelkey
 	// NOOOOOOO!!!!
 	//		unsigned long tubeno = itr->first;
-
 			//Retrieve the detector object with the Channelkey
 //			Detector* thelappd = _geom->ChannelToDetector(tubeno);
 			Detector* thelappd = _geom->ChannelToDetector(1000);
 			std::map<unsigned long, Channel>* lappdchannel = thelappd->GetChannels();
+            
 		  int numberOfLAPPDChannels = lappdchannel->size();
 		  cout<<"w00T: "<<numberOfLAPPDChannels<<endl;
 			//Use the detector object to get the detector ID

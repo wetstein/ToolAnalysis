@@ -39,7 +39,7 @@ bool LAPPDcfd::Execute(){
   std::map<unsigned long,vector<Waveform<double>>> rawlappddata;
   bool testval =  m_data->Stores["ANNIEEvent"]->Get(CFDInputWavLabel,rawlappddata);
 
-  cout<<"here 0"<<endl;
+  cout<<CFDInputWavLabel<<" here 0: "<< rawlappddata.size()<<endl;
 
   // get first-level pulse reco from the Boost Store
   std::map<unsigned long,vector<LAPPDPulse>> SimpleRecoLAPPDPulses;
@@ -50,9 +50,9 @@ bool LAPPDcfd::Execute(){
 
   // get the sim-level information
 
-  std::map<int,vector<LAPPDHit>> lappdmchits;
+  std::map<unsigned long,vector<LAPPDHit>> lappdmchits;
   if(isSim){
-    m_data->Stores["ANNIEEvent"]->Get("MCLAPPDHit",lappdmchits);
+  m_data->Stores["ANNIEEvent"]->Get("MCLAPPDHits",lappdmchits);
   }
 
   cout<<"here now"<<endl;
@@ -61,29 +61,32 @@ bool LAPPDcfd::Execute(){
   std::map<unsigned long,vector<LAPPDPulse>> CFDRecoLAPPDPulses;
 
   // Loop over all channels
-  map <unsigned long, vector<Waveform<double>>> :: iterator itr;
-  for (itr = rawlappddata.begin(); itr != rawlappddata.end(); ++itr){
-
-    // Get the channel number and a vector of Waveforms
-    int channelno = itr->first;
-    vector<Waveform<double>> Vwavs = itr->second;
-
-    // get the vector of pulses correseponding to the channel
-    map<unsigned long, vector<LAPPDPulse>>::iterator p;
-    p = SimpleRecoLAPPDPulses.find(channelno);
+  map<unsigned long, vector<LAPPDPulse>>:: iterator p;
+ 
+  for (p = SimpleRecoLAPPDPulses.begin(); p != SimpleRecoLAPPDPulses.end(); ++p){
+   // cout<<"In loop of channels"<<endl;
+    // Get the channel number and a vector of pulses
+    unsigned long channelno = p->first;
     vector<LAPPDPulse> Vpulses = p->second;
-
-//    std::cout<<"************************************************"<<std::endl;
-//    std::cout<<"IN LAPPDCFD:: channel: "<<channelno<<std::endl;
+     // cout<<"still in loop "<<SimpleRecoLAPPDPulses.size() <<" " << channelno<<endl;
+    // get the vector of waveforms correseponding to the channel
+    map <unsigned long, vector<Waveform<double>>> :: iterator itr;
+    itr = rawlappddata.find(channelno);
+    //cout<<"Is it here? "<<endl;
+    vector<Waveform<double>> Vwavs = itr->second;
+    //cout<<"or here?"<<endl;
+    std::cout<<"************************************************"<<std::endl;
+    std::cout<<"IN LAPPDCFD:: channel: "<<channelno<<std::endl;
+    
 
     if(isSim){
       // If the data is simulated data, we loop over the true hits
       // and print them to screen
-//      std::cout<<"simulated pulse: ";
-      map<int, vector<LAPPDHit>>::iterator p;
+/*    std::cout<<"simulated pulse: ";
+      map<unsigned long, vector<LAPPDHit>>::iterator p;
       p = lappdmchits.find(0);
       vector<LAPPDHit> Vhits = p->second;
-/*
+
       std::cout<<Vhits.size()<<" simulated pulses. ";
       for(int np=0; np<Vhits.size(); np++){
         std::cout<<"p"<<np<<"=(t="<<(Vhits.at(np)).GetTpsec()<<") ";
@@ -106,23 +109,24 @@ bool LAPPDcfd::Execute(){
 
           // for each pulse on the Waveform find the time using CFD1 algorithm
           double cfdtime = CFD_Discriminator1(bwav.GetSamples(),Vpulses.at(j));
-          //std::cout<<"for pulse #"<<j<<" (Q="<<(Vpulses.at(j)).GetCharge()<<",Amp="<<(Vpulses.at(j)).GetPeak()<<",LowRange="<<(Vpulses.at(j)).GetLowRange()<<",HiRange="<<(Vpulses.at(j)).GetHiRange()<<") "<<"  cfd_time="<<cfdtime<<std::endl;
+          std::cout<<"for pulse #"<<j<<" (Q="<<(Vpulses.at(j)).GetCharge()<<",Amp="<<(Vpulses.at(j)).GetPeak()<<",LowRange="<<(Vpulses.at(j)).GetLowRange()<<",HiRange="<<(Vpulses.at(j)).GetHiRange()<<") "<<"  cfd_time="<<cfdtime<<std::endl;
 
           // Store the reconstructed time in a new LAPPDPulse
           LAPPDPulse apulse(0,channelno,(cfdtime/1000.),(Vpulses.at(j)).GetCharge(),(Vpulses.at(j)).GetPeak(),(Vpulses.at(j)).GetLowRange(),(Vpulses.at(j)).GetHiRange());
           thepulses.push_back(apulse);
         }
       }
+      
         //std::cout<<" "<<std::endl;
         // Put the newly reconsructed LAPPDPulses into a map, by channel
-        CFDRecoLAPPDPulses.insert(pair <int,vector<LAPPDPulse>> (channelno,thepulses));
+        CFDRecoLAPPDPulses.insert(pair <unsigned long,vector<LAPPDPulse>> (channelno,thepulses));
     }
 
     // Add the CFD reconstructed information to the Boost Store
     m_data->Stores["ANNIEEvent"]->Set("CFDRecoLAPPDPulses",CFDRecoLAPPDPulses);
 
-
-
+    cout<<"gGJDKLJ"<<endl;
+    
   return true;
 }
 

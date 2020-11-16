@@ -31,33 +31,35 @@ bool LAPPDFilter::Execute(){
   Waveform<double> bwav;
 
   // get raw lappd data
-  std::map<int,vector<Waveform<double>>> rawlappddata;
-
+  std::map<unsigned long,vector<Waveform<double>>> rawlappddata;
+   
   //m_data->Stores["ANNIEEvent"]->Get("RawLAPPDData",rawlappddata);
   m_data->Stores["ANNIEEvent"]->Get(FilterInputWavLabel,rawlappddata);
-
+     cout<<"In FilterInputWavLabel "<< FilterInputWavLabel<<" "<<rawlappddata.size()<<endl;
   // the filtered Waveform
-  std::map<int,vector<Waveform<double>>> filteredlappddata;
-
-  map <int, vector<Waveform<double>>> :: iterator itr;
+  std::map<unsigned long,vector<Waveform<double>>> filteredlappddata;
+   // cout<<"In LAPPDFilter "<< rawlappddata.size()<<endl;
+  map <unsigned long, vector<Waveform<double>>> :: iterator itr;
   for (itr = rawlappddata.begin(); itr != rawlappddata.end(); ++itr){
-    int channelno = itr->first;
+    unsigned long channelno = itr->first;
+      //cout<<"Filter channel= "<<channelno<<endl;
     vector<Waveform<double>> Vwavs = itr->second;
     vector<Waveform<double>> Vfwavs;
 
     //loop over all Waveforms
     for(int i=0; i<Vwavs.size(); i++){
-
+      // cout<<"LOOPING WAVEFORMS!!"<<endl;
         Waveform<double> bwav = Vwavs.at(i);
         Waveform<double> filtwav = Waveform_FFT(bwav);
         Vfwavs.push_back(filtwav);
       }
 
-      filteredlappddata.insert(pair <int,vector<Waveform<double>>> (channelno,Vfwavs));
+      filteredlappddata.insert(pair <unsigned long,vector<Waveform<double>>> (channelno,Vfwavs));
     }
 
   m_data->Stores["ANNIEEvent"]->Set("FiltLAPPDData",filteredlappddata);
-
+    
+    cout<<"End of LAPPDFilter "<<filteredlappddata.size()<<endl;
 
   return true;
 }
