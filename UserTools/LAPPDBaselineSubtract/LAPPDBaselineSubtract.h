@@ -27,6 +27,7 @@ class LAPPDBaselineSubtract: public Tool {
    double Deltat;
    double LowBLfitrange;
    double HiBLfitrange;
+    string BLSInputWavLabel;
 
 };
 

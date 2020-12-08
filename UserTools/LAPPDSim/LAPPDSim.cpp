@@ -71,6 +71,12 @@ bool LAPPDSim::Initialise(std::string configfile, DataModel &data)
 	{
 		_display = new LAPPDDisplay(outputFile, _display_config);
 	}
+    bool isFiltered = false;
+    m_data->Stores["ANNIEEvent"]->Header->Set("isFiltered",isFiltered);
+    bool isBLsub = false;
+    m_data->Stores["ANNIEEvent"]->Header->Set("isBLsubtracted",isBLsub);
+    bool isCFD=false;
+    m_data->Stores["ANNIEEvent"]->Header->Set("isCFD",isCFD);
 
 	cout<<"Done initializing"<<endl;
 

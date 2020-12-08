@@ -14,11 +14,16 @@ bool LAPPDCluster::Initialise(std::string configfile, DataModel &data){
 
   m_data->Stores["ANNIEEvent"]->Header->Get("AnnieGeometry", _geom);
     //cout<<"loaded Geom"<<endl;
-  TString CL;
-  m_variables.Get("ClusterLabel",CL);
+  TString SCL;
+  m_variables.Get("SimpleClusterLabel",SCL);
     //cout<<"GKLDAJGAFSFD"<<CL<<endl;
-  ClusterLabel = CL;
-    cout<<ClusterLabel<<endl;
+  SimpleClusterLabel = SCL;
+    TString CFDCL;
+    m_variables.Get("CFDClusterLabel",CFDCL);
+      //cout<<"GKLDAJGAFSFD"<<CL<<endl;
+    CFDClusterLabel = CFDCL;
+    
+    //cout<<ClusterLabel<<endl;
 
   return true;
 }
@@ -27,17 +32,26 @@ bool LAPPDCluster::Initialise(std::string configfile, DataModel &data){
 bool LAPPDCluster::Execute(){
 
   //cout<<"executing lappdcluster!!!"<<endl;
-
-  std::map <unsigned long, vector<LAPPDPulse>> SimpleRecoLAPPDPulses;
-    cout<< "ClusterLabel  "<<ClusterLabel<<endl;
-  m_data->Stores["ANNIEEvent"]->Get(ClusterLabel,SimpleRecoLAPPDPulses);
-    cout<<SimpleRecoLAPPDPulses.size()<<endl;
-  //m_data->Stores["ANNIEEvent"]->Get("SimpleRecoLAPPDPulses",SimpleRecoLAPPDPulses);
-  //  cout<<"We got "<< SimpleRecoLAPPDPulses.size()<< " Pulses" << endl;
+  bool isCFD;
+  m_data->Stores["ANNIEEvent"]->Get("isCFD",isCFD);
+  std::map <unsigned long, vector<LAPPDPulse>> RecoLAPPDPulses;
+  //cout<< "ClusterLabel  "<<ClusterLabel<<endl;
+  if(isCFD==true){
+    m_data->Stores["ANNIEEvent"]->Get(CFDClusterLabel,RecoLAPPDPulses);
+      //cout<<"Are you there?"<<endl;
+  }
+  else if(isCFD==false){
+    m_data->Stores["ANNIEEvent"]->Get(SimpleClusterLabel,RecoLAPPDPulses);
+      //cout<<"excuse me?"<<endl;
+  }
+  
+  //cout<<RecoLAPPDPulses.size()<<endl;
+  //m_data->Stores["ANNIEEvent"]->Get("RecoLAPPDPulses",RecoLAPPDPulses);
+    //cout<<"We got "<< RecoLAPPDPulses.size()<< " Pulses" << endl;
   std::map <unsigned long, vector<LAPPDPulse>> :: iterator pulseitr;
 
 
-  //cout<<"Grabbed RecoLAPPDPulses "<<SimpleRecoLAPPDPulses.size()<<endl;
+  //cout<<"Grabbed RecoLAPPDPulses "<<RecoLAPPDPulses.size()<<endl;
 
   vector<unsigned long> chanhand;
   std::map <unsigned long, vector<LAPPDHit>> Hits;
@@ -45,7 +59,7 @@ bool LAPPDCluster::Execute(){
 
 
   //cout<<"!!!That is all pulses we have!!!"<<endl;
-  for (pulseitr = SimpleRecoLAPPDPulses.begin(); pulseitr != SimpleRecoLAPPDPulses.end(); ++pulseitr){
+  for (pulseitr = RecoLAPPDPulses.begin(); pulseitr != RecoLAPPDPulses.end(); ++pulseitr){
     vector<LAPPDHit> thehits;
     vector<double> localposition;
     double ParaPosition=-5555;
@@ -86,7 +100,7 @@ bool LAPPDCluster::Execute(){
     std::map<unsigned long , LAPPDPulse> cPulse;
     std::map <unsigned long, vector<LAPPDPulse>> :: iterator oppoitr;
 
-    for (oppoitr = SimpleRecoLAPPDPulses.begin(); oppoitr != SimpleRecoLAPPDPulses.end(); ++oppoitr){
+    for (oppoitr = RecoLAPPDPulses.begin(); oppoitr != RecoLAPPDPulses.end(); ++oppoitr){
 
       unsigned long oppochankey = oppoitr->first;
 
@@ -239,7 +253,7 @@ bool LAPPDCluster::Execute(){
 
 
   }
-    cout << "In LAPPDCluster: " << Hits.size()<< endl;
+    //cout << "In LAPPDCluster: " << Hits.size()<< endl;
   m_data->Stores["ANNIEEvent"]->Set("Clusters",Hits);
   return true;
 }

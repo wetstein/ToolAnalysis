@@ -5,6 +5,7 @@ NChannels 60
 TrigChannel -1
 
 #LAPPDBaselineSubtract
+BLSInputWavLabel LAPPDWaveforms
 LowBLfitrange 40000;
 HiBLfitrange  60000;
 
@@ -16,8 +17,8 @@ FileInput ../LAPPDdata_fff/LAPPD25_3.22.18/2400_2100_1300_bsln_2sided_root.fff
 
 #LAPPDFilter
 #FilterInputWavLabel RawLAPPDData
-FilterInputWavLabel LAPPDWaveforms
-#FilterInputWavLabel BLsubtractedLAPPDData
+RawFilterInputWavLabel LAPPDWaveforms
+BLSFilterInputWavLabel BLsubtractedLAPPDData
 doFilter false
 CutoffFrequency 500000000
 
@@ -26,15 +27,17 @@ IntegLow  64000
 IntegHi 67000
 
 #LAPPDFindPeak
-PeakInputWavLabel FiltLAPPDData
-#PeakInputWavLabel LAPPDWaveforms
+FiltPeakInputWavLabel FiltLAPPDData
+RawPeakInputWavLabel LAPPDWaveforms
+BLSPeakInputWavLabel BLsubtractedLAPPDData
 TotThreshold 0.5
 MinimumTot 1000.
 Deltat 100.
 
 # LAPPDcfd
-CFDInputWavLabel FiltLAPPDData
-#CFDInputWavLabel LAPPDWaveforms
+FiltCFDInputWavLabel FiltLAPPDData
+RawCFDInputWavLabel LAPPDWaveforms
+BLSCFDInputWavLabel BLsubtractedLAPPDData
 Fraction_CFD 0.4
 
 # LAPPDSave
@@ -46,5 +49,5 @@ outfile ../LAPPDoutputs/SimTest.root
 NHistos 100
 
 #LAPPDCluster
-#ClusterLabel SimpleRecoLAPPDPulses
-ClusterLabel CFDRecoLAPPDPulses
+SimpleClusterLabel SimpleRecoLAPPDPulses
+CFDClusterLabel CFDRecoLAPPDPulses

@@ -12,10 +12,16 @@ bool LAPPDcfd::Initialise(std::string configfile, DataModel &data){
   m_data= &data; //assigning transient data pointer
   /////////////////////////////////////////////////////////////////
 
-  TString CIWL;
-  m_variables.Get("CFDInputWavLabel",CIWL);
-  CFDInputWavLabel = CIWL;
-  cout<<"INITIALIZING CFD "<<CFDInputWavLabel<<endl;
+  TString FCIWL;
+  m_variables.Get("FiltCFDInputWavLabel",FCIWL);
+  FiltCFDInputWavLabel = FCIWL;
+  TString RCIWL;
+  m_variables.Get("RawCFDInputWavLabel",RCIWL);
+  RawCFDInputWavLabel = RCIWL;
+  TString BLSCIWL;
+  m_variables.Get("BLSCFDInputWavLabel",BLSCIWL);
+  BLSCFDInputWavLabel = BLSCIWL;
+  //cout<<"INITIALIZING CFD "<<CFDInputWavLabel<<endl;
 
   // Get the CFD threshold from the config file
   m_variables.Get("Fraction_CFD", Fraction_CFD);
@@ -30,32 +36,47 @@ bool LAPPDcfd::Initialise(std::string configfile, DataModel &data){
 
 
 bool LAPPDcfd::Execute(){
-
+  bool isCFD=true;
+  m_data->Stores["ANNIEEvent"]->Set("isCFD",isCFD);
+  bool isBLsub;
+  m_data->Stores["ANNIEEvent"]->Get("isBLsubtracted",isBLsub);
+  bool isFiltered;
+  m_data->Stores["ANNIEEvent"]->Get("isFiltered",isFiltered);
   Waveform<double> bwav;
 
-  cout<<"in execute "<<CFDInputWavLabel<<endl;
+  //cout<<"in execute "<<CFDInputWavLabel<<endl;
 
   // get raw lappd data from the Boost Store
-  std::map<unsigned long,vector<Waveform<double>>> rawlappddata;
-  bool testval =  m_data->Stores["ANNIEEvent"]->Get(CFDInputWavLabel,rawlappddata);
+  std::map<unsigned long,vector<Waveform<double>>> lappddata;
+    bool testval;
+    if(isBLsub==false && isFiltered==false){
+       testval = m_data->Stores["ANNIEEvent"]->Get(RawCFDInputWavLabel,lappddata);
+    }
+    else if(isBLsub==true && isFiltered==false){
+        testval = m_data->Stores["ANNIEEvent"]->Get(BLSCFDInputWavLabel,lappddata);
+    }
+    else if(isFiltered==true){
+        testval = m_data->Stores["ANNIEEvent"]->Get(FiltCFDInputWavLabel,lappddata);
+        //cout<<"Im inside the if statement cfd"<<endl;
+    }
 
-  cout<<CFDInputWavLabel<<" here 0: "<< rawlappddata.size()<<endl;
+  //cout<<CFDInputWavLabel<<" here 0: "<<lappddata.size()<<endl;
 
   // get first-level pulse reco from the Boost Store
   std::map<unsigned long,vector<LAPPDPulse>> SimpleRecoLAPPDPulses;
   m_data->Stores["ANNIEEvent"]->Get("SimpleRecoLAPPDPulses",SimpleRecoLAPPDPulses);
 
-  cout<<"here 1"<<endl;
+  //cout<<"here 1"<<endl;
 
 
   // get the sim-level information
 
   std::map<unsigned long,vector<LAPPDHit>> lappdmchits;
   if(isSim){
-  m_data->Stores["ANNIEEvent"]->Get("MCLAPPDHits",lappdmchits);
+    m_data->Stores["ANNIEEvent"]->Get("MCLAPPDHits",lappdmchits);
   }
 
-  cout<<"here now"<<endl;
+  //cout<<"here now"<<endl;
 
   // Place to store the reconstructed pulses
   std::map<unsigned long,vector<LAPPDPulse>> CFDRecoLAPPDPulses;
@@ -71,7 +92,7 @@ bool LAPPDcfd::Execute(){
      // cout<<"still in loop "<<SimpleRecoLAPPDPulses.size() <<" " << channelno<<endl;
     // get the vector of waveforms correseponding to the channel
     map <unsigned long, vector<Waveform<double>>> :: iterator itr;
-    itr = rawlappddata.find(channelno);
+    itr = lappddata.find(channelno);
     //cout<<"Is it here? "<<endl;
     vector<Waveform<double>> Vwavs = itr->second;
     //cout<<"or here?"<<endl;
@@ -121,11 +142,11 @@ bool LAPPDcfd::Execute(){
         // Put the newly reconsructed LAPPDPulses into a map, by channel
         CFDRecoLAPPDPulses.insert(pair <unsigned long,vector<LAPPDPulse>> (channelno,thepulses));
     }
-
+    //cout<<"There are "<< CFDRecoLAPPDPulses.size()<< " Pulses" << endl;
     // Add the CFD reconstructed information to the Boost Store
     m_data->Stores["ANNIEEvent"]->Set("CFDRecoLAPPDPulses",CFDRecoLAPPDPulses);
 
-    cout<<"gGJDKLJ"<<endl;
+    //cout<<"gGJDKLJ"<<endl;
     
   return true;
 }

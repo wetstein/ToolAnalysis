@@ -12,26 +12,31 @@ bool LAPPDBaselineSubtract::Initialise(std::string configfile, DataModel &data){
   m_data= &data; //assigning transient data pointer
   /////////////////////////////////////////////////////////////////
 
-  bool isBLsub = true;
-  m_data->Stores["ANNIEEvent"]->Header->Set("isBLsubtracted",isBLsub);
+  //bool isBLsub = true;
+  //m_data->Stores["ANNIEEvent"]->Header->Set("isBLsubtracted",isBLsub);
 
   m_variables.Get("Nsamples", DimSize);
   m_variables.Get("SampleSize",Deltat);
   m_variables.Get("LowBLfitrange", LowBLfitrange);
   m_variables.Get("HiBLfitrange",HiBLfitrange);
+    TString BLSIWL;
+    m_variables.Get("BLSInputWavLabel", BLSIWL);
+    BLSInputWavLabel= BLSIWL;
 
   return true;
 }
 
 
 bool LAPPDBaselineSubtract::Execute(){
-
+    bool isBLsub=true;
+    m_data->Stores["ANNIEEvent"]->Set("isBLsubtracted",isBLsub);
+    cout<<"made it to here"<<endl;
   Waveform<double> bwav;
 
   // get raw lappd data
   std::map<int,vector<Waveform<double>>> rawlappddata;
   m_data->Stores["ANNIEEvent"]->Get("RawLAPPDData",rawlappddata);
-
+    cout<< "did it get to this"<<endl;
   // the filtered Waveform
   std::map<int,vector<Waveform<double>>> blsublappddata;
 

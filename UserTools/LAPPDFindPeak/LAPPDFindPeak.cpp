@@ -12,9 +12,15 @@ bool LAPPDFindPeak::Initialise(std::string configfile, DataModel &data){
   m_data= &data; //assigning transient data pointer
   /////////////////////////////////////////////////////////////////
 
-  TString PIWL;
-  m_variables.Get("PeakInputWavLabel",PIWL);
-  PeakInputWavLabel = PIWL;
+  TString FPIWL;
+  m_variables.Get("FiltPeakInputWavLabel",FPIWL);
+  FiltPeakInputWavLabel = FPIWL;
+  TString RPIWL;
+  m_variables.Get("RawPeakInputWavLabel",RPIWL);
+  RawPeakInputWavLabel = RPIWL;
+  TString BLSPIWL;
+  m_variables.Get("BLSPeakInputWavLabel",BLSPIWL);
+  BLSPeakInputWavLabel = BLSPIWL;
   m_variables.Get("TotThreshold", TotThreshold);
   m_variables.Get("MinimumTot", MinimumTot);
   m_variables.Get("Deltat", Deltat);
@@ -26,6 +32,11 @@ bool LAPPDFindPeak::Initialise(std::string configfile, DataModel &data){
 bool LAPPDFindPeak::Execute(){
 
   std::cout<<"in FindPeak"<<std::endl;
+    bool isBLsub;
+    m_data->Stores["ANNIEEvent"]->Get("isBLsubtracted",isBLsub);
+    bool isFiltered;
+    m_data->Stores["ANNIEEvent"]->Get("isFiltered",isFiltered);
+    //cout<<isBLsub<<"Please Work"<<endl;
   //Waveform<double> bwav;
   //m_data->Stores["ANNIEEvent"]->Print();
   //bool testval =  m_data->Stores["ANNIEEvent"]->Get("LAPPDtrace",bwav);
@@ -33,21 +44,30 @@ bool LAPPDFindPeak::Execute(){
   //std::cout<<"In Peak Finding Tool..............................."<<std::endl;
 
   // get raw lappd data
-  std::map<unsigned long,vector<Waveform<double>>> rawlappddata;
-  m_data->Stores["ANNIEEvent"]->Get(PeakInputWavLabel,rawlappddata);
-  //bool testval =  m_data->Stores["ANNIEEvent"]->Get("RawLAPPDData",rawlappddata);
-  cout<<PeakInputWavLabel<<" HElp "<<rawlappddata.size()<<endl;
+    std::map<unsigned long,vector<Waveform<double>>> lappddata;
+    if(isBLsub==false && isFiltered==false){
+        m_data->Stores["ANNIEEvent"]->Get(RawPeakInputWavLabel,lappddata);
+    }
+    else if(isBLsub==true && isFiltered==false){
+        m_data->Stores["ANNIEEvent"]->Get(BLSPeakInputWavLabel,lappddata);
+    }
+    else if(isFiltered==true){
+        m_data->Stores["ANNIEEvent"]->Get(FiltPeakInputWavLabel,lappddata);
+        //cout<<"Find Peak in isFiltered if statement"<<endl;
+    }
+  //bool testval =  m_data->Stores["ANNIEEvent"]->Get("RawLAPPDData",lappddata);
+  //cout<<FiltPeakInputWavLabel<<" HElp "<<lappddata.size()<<endl;
 
   // make reconstructed pulses
   std::map<unsigned long,vector<LAPPDPulse>> SimpleRecoLAPPDPulses;
 
   map <unsigned long, vector<Waveform<double>>> :: iterator itr;
 
-  for (itr = rawlappddata.begin(); itr != rawlappddata.end(); ++itr){
+  for (itr = lappddata.begin(); itr != lappddata.end(); ++itr){
     unsigned long channelno = itr->first;
     vector<Waveform<double>> Vwavs = itr->second;
 
-   //cout<<"channel= "<<channelno<<endl;
+  // cout<<"channel= "<<channelno<<endl;
 
     //loop over all Waveforms
     std::vector<LAPPDPulse> thepulses;
@@ -67,7 +87,7 @@ bool LAPPDFindPeak::Execute(){
     }
     if(thepulses.size()>0)
       {
-          cout<<channelno<<" Channel with pulses in FindPeak"<<endl;
+          //cout<<channelno<<" Channel with pulses in FindPeak"<<endl;
         SimpleRecoLAPPDPulses.insert(pair <unsigned long,vector<LAPPDPulse>> (channelno,thepulses));
       }       
   }
