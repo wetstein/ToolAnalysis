@@ -7,7 +7,7 @@ LAPPDFindPeak LAPPDFindPeak configfiles/LAPPDteststand/ConfigVarsPSEC4
 #ClusterDummy ClusterDummy configfiles/LAPPDteststand/ConfigVarsPSEC4
 #LAPPDParseScope LAPPDParseScope configfiles/LAPPDteststand/ConfigVarsScope
 #LAPPDIntegratePulse LAPPDIntegratePulse configfiles/LAPPDteststand/ConfigVarsScope
-#LAPPDcfd LAPPDcfd configfiles/LAPPDteststand/ConfigVarsPSEC4
+LAPPDcfd LAPPDcfd configfiles/LAPPDteststand/ConfigVarsPSEC4
 #LAPPDlasertestHitFinder LAPPDlasertestHitFinder configfiles/LAPPDteststand/ConfigVarsScope
 #LAPPDSaveROOT LAPPDSaveROOT configfiles/LAPPDteststand/ConfigVarsScope
 #LAPPDSave SaveANNIEEvent configfiles/LAPPDteststand/ConfigVarsScope

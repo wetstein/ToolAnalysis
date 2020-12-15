@@ -98,5 +98,6 @@ if (tool=="MCHitToHitComparer") ret=new MCHitToHitComparer;
 if (tool=="ClusterTree") ret=new ClusterTree;
 if (tool=="ClusterDummy") ret=new ClusterDummy;
 if (tool=="LAPPDCluster") ret=new LAPPDCluster;
+if (tool=="PSECReadIn") ret=new PSECReadIn;
 return ret;
 }
