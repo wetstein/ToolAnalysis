@@ -22,6 +22,11 @@ BLSFilterInputWavLabel BLsubtractedLAPPDData
 doFilter false
 CutoffFrequency 500000000
 
+#LAPPDPlotWaveForms
+PlotWavLabel LAPPDWaveforms
+outfile WaveForms.root
+NHistos 10
+
 #LAPPDIntegratePulse
 IntegLow  64000
 IntegHi 67000
@@ -44,9 +49,9 @@ Fraction_CFD 0.4
 path ./testoutput
 
 # LAPPDSaveROOT
-outfile ../LAPPDoutputs/SimTest.root
+#outfile SimTest.root
 #outfile ./testout.root
-NHistos 100
+#NHistos 10
 
 #LAPPDCluster
 SimpleClusterLabel SimpleRecoLAPPDPulses
