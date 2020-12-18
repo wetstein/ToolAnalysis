@@ -107,3 +107,4 @@
 #include "ClusterDummy.h"
 #include "LAPPDCluster.h"
 #include "PSECReadIn.h"
+#include "LAPPDPlotWaveForms.h"
