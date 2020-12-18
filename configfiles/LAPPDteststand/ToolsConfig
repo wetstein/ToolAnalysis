@@ -2,6 +2,7 @@ LoadGeometry LoadGeometry configfiles/LoadGeometry/LoadGeometryConfig
 GenerateHits GenerateHits configfiles/LAPPDteststand/ConfigVarsSim
 LAPPDSim  LAPPDSim configfiles/LAPPDteststand/ConfigVarsSim
 #LAPPDBaselineSubtract LAPPDBaselineSubtract configfiles/LAPPDteststand/ConfigVarsPSEC4
+LAPPDPlotWaveForms  LAPPDPlotWaveForms configfiles/LAPPDteststand/ConfigVarsPSEC4
 LAPPDFilter LAPPDFilter configfiles/LAPPDteststand/ConfigVarsPSEC4
 LAPPDFindPeak LAPPDFindPeak configfiles/LAPPDteststand/ConfigVarsPSEC4
 #ClusterDummy ClusterDummy configfiles/LAPPDteststand/ConfigVarsPSEC4
