@@ -3,7 +3,8 @@
 
 #include <string>
 #include <iostream>
-
+#include <map>
+#include <fstream>
 #include "Tool.h"
 
 
@@ -33,8 +34,8 @@ class PSECReadIn: public Tool {
     int NChannels;
     int Nsamples;
     int TrigChannel;
-
-
+    std::map<unsigned long, vector<Waveform<double>>>* LAPPDWaveforms;
+    streampos dataPosition;
 
 
 };
