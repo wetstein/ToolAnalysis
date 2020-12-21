@@ -26,15 +26,23 @@ class PSECReadIn: public Tool {
   bool Initialise(std::string configfile,DataModel &data); ///< Initialise Function for setting up Tool resources. @param configfile The path and name of the dynamic configuration file to read in. @param data A reference to the transient data class used to pass information between Tools.
   bool Execute(); ///< Execute function used to perform Tool purpose.
   bool Finalise(); ///< Finalise function used to clean up resources.
+  bool ReadPedestals(int boardNo); ///< Read in the Pedestal Files
+  bool MakePedestals(); ///< Make a Pedestal File
 
 
  private:
     
     ifstream DataFile;
+    ifstream PedFile;
+    string PedFileName1;
+    string PedFileName2;
+    int DoPedSubtract;
     int NChannels;
     int Nsamples;
     int TrigChannel;
     std::map<unsigned long, vector<Waveform<double>>>* LAPPDWaveforms;
+    std::map<unsigned long, vector<int>> *PedestalValues;
+
     streampos dataPosition;
 
 
