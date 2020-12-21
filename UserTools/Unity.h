@@ -108,3 +108,4 @@
 #include "LAPPDCluster.h"
 #include "PSECReadIn.h"
 #include "LAPPDPlotWaveForms.h"
+#include "LAPPDReorderData.h"
