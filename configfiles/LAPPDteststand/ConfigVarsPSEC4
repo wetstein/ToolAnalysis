@@ -13,7 +13,11 @@ HiBLfitrange  60000;
 SimInput  ./UserTools/LAPPDSim/pulsecharacteristics.root
 
 #PSECReadIn
-PSECinputfile Data_20200212_151445.txt
+PSECinputfile Data_20201712_174129_X_-15._Y_-75.txt
+DoPedSubtraction 1
+Nboards 2
+Pedinputfile1 PEDS_ACDC_board0.txt
+Pedinputfile2 PEDS_ACDC_board1.txt
 
 # LAPPDParseScope
 FileInput ../LAPPDdata_fff/LAPPD25_3.22.18/2400_2100_1300_bsln_2sided_root.fff
