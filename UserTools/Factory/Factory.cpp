@@ -100,5 +100,6 @@ if (tool=="ClusterDummy") ret=new ClusterDummy;
 if (tool=="LAPPDCluster") ret=new LAPPDCluster;
 if (tool=="PSECReadIn") ret=new PSECReadIn;
 if (tool=="LAPPDPlotWaveForms") ret=new LAPPDPlotWaveForms;
+if (tool=="LAPPDReorderData") ret=new LAPPDReorderData;
 return ret;
 }
