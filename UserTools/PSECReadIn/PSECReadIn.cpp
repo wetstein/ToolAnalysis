@@ -21,6 +21,9 @@ bool PSECReadIn::Initialise(std::string configfile, DataModel &data){
   m_variables.Get("Nboards", Nboards);
   m_variables.Get("Pedinputfile1", PedFileName1);
   m_variables.Get("Pedinputfile2", PedFileName2);
+  PSECReadInVerbosity=0;
+  m_variables.Get("PSECReadInVerbosity",PSECReadInVerbosity);
+
     
   TString OWL;
   m_variables.Get("RawDataOutpuWavLabel",OWL);
@@ -56,7 +59,9 @@ bool PSECReadIn::Initialise(std::string configfile, DataModel &data){
       ReadPedestals(0);
       if(Nboards==2) ReadPedestals(1);
   }
-      
+  
+  eventNo=0; //event number
+    
   cout<<"PEDSIZES: "<<PedestalValues->size()<<" "<<PedestalValues->at(0).size()<<" "<<PedestalValues->at(4).at(5)<<endl;
     
   return true;
@@ -65,10 +70,16 @@ bool PSECReadIn::Initialise(std::string configfile, DataModel &data){
 
 bool PSECReadIn::Execute(){
   //create raw lappd object
+  
+    
+  if(eventNo%10==0) cout<<"Event: "<<eventNo<<endl;
+    
+  if(PSECReadInVerbosity>0) cout<<"BEGIN PSECReadIn "<< endl;
+    
   LAPPDWaveforms = new std::map<unsigned long, vector<Waveform<double>>>;
     
   //create a waveform for temp storage
-  int eventNo=0; //event number
+ 
   
   string nextLine; //temp line to parse
     
@@ -102,11 +113,14 @@ bool PSECReadIn::Execute(){
               //sampleNo=tempValue;
               continue;
           }
+          
+          if(PSECReadInVerbosity>1) {cout<<"PARSING 30 Channels for sample: "<<sampleNo<<endl;}
+          
           //this is the meta data per format
           if((location)%31==0)
           {
               acdcmetadata.push_back(stempValue);
-              //cout<<"yes "<< location<<" "<<stempValue<<endl;
+              if(PSECReadInVerbosity>1) { cout<<"parsing metadata at column: "<< location<<" "<<stempValue<<endl;}
               continue;
           }
           
@@ -117,10 +131,9 @@ bool PSECReadIn::Execute(){
           if((PedestalValues->count(channelNo))>0){
               pitr = PedestalValues->find(channelNo);
               theped = (pitr->second).at(sampleNo);
-              //cout<<"Made it? "<<theped<<endl;
           } else theped = 0;
           
-          //if(theped==0) cout<<"THE PED = 0!!!!!!!! "<<theped<<" "<<channelNo<<" "<<sampleNo<<" "<<PedestalValues->count(channelNo)<<endl;
+          if(PSECReadInVerbosity>1 && theped==0) cout<<"THE PED = 0!!!!!!!! "<<theped<<" "<<channelNo<<" "<<sampleNo<<" "<<PedestalValues->count(channelNo)<<endl;
           int pedsubValue = tempValue - theped;
           
           if(sampleNo==0)
@@ -136,17 +149,13 @@ bool PSECReadIn::Execute(){
               //each tempwav will be inserted into the correct channelno
               LAPPDWaveforms->insert(pair<unsigned long, vector<Waveform<double>>>(channelNo,Vtempwav));
               //clear the tempwav for a new value
-              //cout<<"FIRST SAMPLE: "<<eventNo<<" "<<sampleNo<<" "<<channelNo<<" "<<tempValue<<endl;
+              if(PSECReadInVerbosity>2) cout<<"FIRST SAMPLE: "<<eventNo<<" "<<sampleNo<<" "<<channelNo<<" "<<tempValue<<endl;
           }
           else
           {
               //fitr = LAPPDWaveforms->find(channelNo);
               (((LAPPDWaveforms->find(channelNo))->second).at(0)).PushSample(0.3*((double)pedsubValue));
-              //cout<<"LATE SAMPLES: "<<eventNo<<" "<<sampleNo<<" "<<channelNo<<" "<<tempValue<<endl;
-              //cout<<"Nsamples "<<(((LAPPDWaveforms->find(channelNo))->second).at(0)).Samples().size()<<endl;
-              //vector<Waveform<double>> Vtemp = itr->second;
-              //((itr->second).at(0)).PushSample(tempValue);
-              //LAPPDWaveforms->insert(pair<unsigned long, vector<Waveform<double>>>(channelNo, Vtemp));
+              if(PSECReadInVerbosity>2) {cout<<"SUBSEQUENT SAMPLES: "<<eventNo<<" "<<sampleNo<<" "<<channelNo<<" "<<tempValue<<endl;}
           }
         
         channelNo++;
@@ -157,18 +166,24 @@ bool PSECReadIn::Execute(){
       //if(sampleNo=='ff')
       if(sampleNo==255)
       {
-          //cout<<"DID THIS HAPPEN "<<sampleNo<<" "<<eventNo<<endl;
-          eventNo++;
+          if(PSECReadInVerbosity>1) {cout<<"END OF THE EVENT "<<sampleNo<<" "<<eventNo<<endl;}
+          //eventNo++;
           break;
       }
       
       //cout<<"at the end"<<endl;
   }
+  
+    if(PSECReadInVerbosity>0) {
+        cout<<"END PSECReadIn...acdcmetadata size: "<<acdcmetadata.size()<<"   LAPPDWaveforms size: "<<LAPPDWaveforms->size()<<endl;
+        cout<<"*************************************************************"<<endl;
+    }
     
   m_data->Stores["ANNIEEvent"]->Set(OutputWavLabel,LAPPDWaveforms);
   m_data->Stores["ANNIEEvent"]->Set("ACDCmetadata",acdcmetadata);
   LAPPDWaveforms->clear();
-
+  eventNo++;
+    
   return true;
 }
 
