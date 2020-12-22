@@ -31,7 +31,7 @@ class LAPPDcfd: public Tool {
    string FiltCFDInputWavLabel;
    string RawCFDInputWavLabel;
    string BLSCFDInputWavLabel;
-
+   int CFDVerbosity;
 
 };
 
