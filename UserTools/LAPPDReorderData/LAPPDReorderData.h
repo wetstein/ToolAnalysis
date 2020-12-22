@@ -29,6 +29,9 @@ class LAPPDReorderData: public Tool {
 
  private:
 
+  string InputWavLabel;
+  string OutputWavLabel;
+
 
 
 
