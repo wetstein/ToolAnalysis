@@ -33,10 +33,12 @@ class LAPPDCluster: public Tool {
 
  private:
 
-Geometry* _geom;
+    Geometry* _geom;
 
-string SimpleClusterLabel;
-string CFDClusterLabel;
+    string SimpleClusterLabel;
+    string CFDClusterLabel;
+    int ClusterVerbosity;
+
 
 };
 
