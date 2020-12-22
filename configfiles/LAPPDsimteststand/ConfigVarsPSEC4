@@ -27,6 +27,7 @@ IntegLow  64000
 IntegHi 67000
 
 #LAPPDFindPeak
+FindPeakVerbosity 0
 FiltPeakInputWavLabel FiltLAPPDData
 RawPeakInputWavLabel LAPPDWaveforms
 BLSPeakInputWavLabel BLsubtractedLAPPDData
@@ -35,6 +36,7 @@ MinimumTot 1000.
 Deltat 100.
 
 # LAPPDcfd
+CFDVerbosity 0
 FiltCFDInputWavLabel FiltLAPPDData
 RawCFDInputWavLabel LAPPDWaveforms
 BLSCFDInputWavLabel BLsubtractedLAPPDData
@@ -49,5 +51,8 @@ outfile ../LAPPDoutputs/SimTest.root
 NHistos 100
 
 #LAPPDCluster
+ClusterVerbosity  0
 SimpleClusterLabel SimpleRecoLAPPDPulses
 CFDClusterLabel CFDRecoLAPPDPulses
+
+ClusterTreeVerbosity  0
