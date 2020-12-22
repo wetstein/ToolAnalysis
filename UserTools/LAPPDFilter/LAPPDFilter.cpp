@@ -23,12 +23,11 @@ bool LAPPDFilter::Initialise(std::string configfile, DataModel &data){
     RawFilterInputWavLabel= RFIWL;
     m_variables.Get("BLSFilterInputWavLabel", BLSFIWL);
     BLSFilterInputWavLabel= BLSFIWL;
-  m_variables.Get("FilterInputWavLabel",FIWL);
-  FilterInputWavLabel = FIWL;
-  m_variables.Get("Nsamples", DimSize);
-  m_variables.Get("CutoffFrequency", CutoffFrequency);
-  m_variables.Get("SampleSize",Deltat);
-    cout<<"dkajklfdjsl"<<endl;
+    m_variables.Get("FilterInputWavLabel",FIWL);
+    FilterInputWavLabel = FIWL;
+    m_variables.Get("Nsamples", DimSize);
+    m_variables.Get("CutoffFrequency", CutoffFrequency);
+    m_variables.Get("SampleSize",Deltat);
     return true;
 }
 
@@ -81,7 +80,7 @@ bool LAPPDFilter::Execute(){
 
       m_data->Stores["ANNIEEvent"]->Set("FiltLAPPDData",filteredlappddata);
     
-      cout<<"End of LAPPDFilter "<<filteredlappddata.size()<<endl;
+      //cout<<"End of LAPPDFilter "<<filteredlappddata.size()<<endl;
 
       return true;
   }
