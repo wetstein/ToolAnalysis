@@ -4,35 +4,42 @@ SampleSize 100
 NChannels 60
 TrigChannel -1
 
-#LAPPDBaselineSubtract
-BLSInputWavLabel LAPPDWaveforms
-LowBLfitrange 40000;
-HiBLfitrange  60000;
+#LoadGeometry
+verbosity 0
+LAPPDChannelCount 60
+FACCMRDGeoFile ./configfiles/LoadGeometry/FullMRDGeometry.csv
+DetectorGeoFile ./configfiles/LoadGeometry/DetectorGeometrySpecs.csv
+LAPPDGeoFile ./configfiles/LAPPDteststand/LAPPDGeometry.csv
+TankPMTGeoFile ./configfiles/LoadGeometry/FullTankPMTGeometry.csv
 
 # LAPPDSim
 SimInput  ./UserTools/LAPPDSim/pulsecharacteristics.root
 
+# LAPPDParseScope
+FileInput ../LAPPDdata_fff/LAPPD25_3.22.18/2400_2100_1300_bsln_2sided_root.fff
+
 #PSECReadIn
+RawDataOutpuWavLabel  RawLAPPDData
 PSECinputfile Data_20201712_174129_X_-15._Y_-75.txt
 DoPedSubtraction 1
 Nboards 2
 Pedinputfile1 PEDS_ACDC_board0.txt
 Pedinputfile2 PEDS_ACDC_board1.txt
 
-# LAPPDParseScope
-FileInput ../LAPPDdata_fff/LAPPD25_3.22.18/2400_2100_1300_bsln_2sided_root.fff
+#LAPPDReorderData
+ReorderInputWavLabel RawLAPPDData
+ReorderOutputWavLabel LAPPDWaveforms
+
+#LAPPDBaselineSubtract
+BLSInputWavLabel LAPPDWaveforms
+LowBLfitrange 1;
+HiBLfitrange  41;
 
 #LAPPDFilter
-#FilterInputWavLabel RawLAPPDData
 RawFilterInputWavLabel LAPPDWaveforms
 BLSFilterInputWavLabel BLsubtractedLAPPDData
 doFilter false
 CutoffFrequency 500000000
-
-#LAPPDPlotWaveForms
-PlotWavLabel LAPPDWaveforms
-outfile WaveForms.root
-NHistos 10
 
 #LAPPDIntegratePulse
 IntegLow  64000
@@ -51,6 +58,11 @@ FiltCFDInputWavLabel FiltLAPPDData
 RawCFDInputWavLabel LAPPDWaveforms
 BLSCFDInputWavLabel BLsubtractedLAPPDData
 Fraction_CFD 0.4
+
+#LAPPDPlotWaveForms
+PlotWavLabel FiltLAPPDData
+outfile WaveForms.root
+NHistos 10
 
 # LAPPDSave
 path ./testoutput
