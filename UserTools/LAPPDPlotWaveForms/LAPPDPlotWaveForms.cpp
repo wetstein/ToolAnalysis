@@ -12,6 +12,8 @@ bool LAPPDPlotWaveForms::Initialise(std::string configfile, DataModel &data){
   m_data= &data; //assigning transient data pointer
   /////////////////////////////////////////////////////////////////
 
+    m_data->Stores["ANNIEEvent"]->Header->Get("AnnieGeometry", _geom);
+    
     TString IWL;
     //RawInputWavLabel;
     m_variables.Get("PlotWavLabel",IWL);
