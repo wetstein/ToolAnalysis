@@ -39,7 +39,7 @@ bool LAPPDReorderData::Execute(){
     int meta26_1 = stoi(Smeta26_1, 0, 16);
     int meta26_2 = stoi(Smeta26_2, 0, 16);
 
-    cout<<"REORDER TIME!!!!   "<<acdcmetadata.size()<<" "<<acdcmetadata.at(52)<<" "<<acdcmetadata.at(53)<<" "<<meta26_1<<" "<<meta26_2<<endl;
+    //cout<<"REORDER TIME!!!!   "<<acdcmetadata.size()<<" "<<acdcmetadata.at(52)<<" "<<acdcmetadata.at(53)<<" "<<meta26_1<<" "<<meta26_2<<endl;
     
     map <unsigned long, vector<Waveform<double>>> :: iterator itr;
 
