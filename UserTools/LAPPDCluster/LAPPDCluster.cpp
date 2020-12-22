@@ -17,11 +17,14 @@ bool LAPPDCluster::Initialise(std::string configfile, DataModel &data){
   TString SCL;
   m_variables.Get("SimpleClusterLabel",SCL);
     //cout<<"GKLDAJGAFSFD"<<CL<<endl;
-  SimpleClusterLabel = SCL;
+    SimpleClusterLabel = SCL;
     TString CFDCL;
     m_variables.Get("CFDClusterLabel",CFDCL);
       //cout<<"GKLDAJGAFSFD"<<CL<<endl;
     CFDClusterLabel = CFDCL;
+    
+    m_variables.Get("ClusterVerbosity",ClusterVerbosity);
+
     
     //cout<<ClusterLabel<<endl;
 
@@ -31,7 +34,7 @@ bool LAPPDCluster::Initialise(std::string configfile, DataModel &data){
 
 bool LAPPDCluster::Execute(){
 
-  //cout<<"executing lappdcluster!!!"<<endl;
+  if(ClusterVerbosity>0) cout<<"executing lappdcluster!!!"<<endl;
   bool isCFD;
   m_data->Stores["ANNIEEvent"]->Get("isCFD",isCFD);
   std::map <unsigned long, vector<LAPPDPulse>> RecoLAPPDPulses;
@@ -88,7 +91,7 @@ bool LAPPDCluster::Execute(){
 
     // cout<<"iterating!!!   "<<chankey<<" "<<vPulse.size()<<endl;
 
-    if(vPulse.size()>1) {cout<<"VPULSE HAS A SIZE OF: "<<vPulse.size()<<endl;}
+    //if(vPulse.size()>1) {cout<<"VPULSE HAS A SIZE OF: "<<vPulse.size()<<endl;}
     for(int jj=0; jj<vPulse.size(); jj++){
       LAPPDPulse apulse = vPulse.at(jj);
       // cout<<"the charge of this pulse is: "<<apulse.GetCharge()<<endl;
@@ -248,12 +251,12 @@ bool LAPPDCluster::Execute(){
     thehits.push_back(myhit);
     Hits.insert(pair <unsigned long,vector<LAPPDHit>> (chankey,thehits));
     chanhand.push_back(chankey);
-    cout<< "HANDLED" << endl;
+    //cout<< "HANDLED" << endl;
 
 
 
   }
-    //cout << "In LAPPDCluster: " << Hits.size()<< endl;
+  if(ClusterVerbosity>0) cout << "Ending LAPPDCluster: " << Hits.size()<< endl;
   m_data->Stores["ANNIEEvent"]->Set("Clusters",Hits);
   return true;
 }
