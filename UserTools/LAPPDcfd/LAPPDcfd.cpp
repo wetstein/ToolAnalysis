@@ -21,6 +21,8 @@ bool LAPPDcfd::Initialise(std::string configfile, DataModel &data){
   TString BLSCIWL;
   m_variables.Get("BLSCFDInputWavLabel",BLSCIWL);
   BLSCFDInputWavLabel = BLSCIWL;
+  m_variables.Get("CFDVerbosity",CFDVerbosity);
+
   //cout<<"INITIALIZING CFD "<<CFDInputWavLabel<<endl;
 
   // Get the CFD threshold from the config file
@@ -96,9 +98,10 @@ bool LAPPDcfd::Execute(){
     //cout<<"Is it here? "<<endl;
     vector<Waveform<double>> Vwavs = itr->second;
     //cout<<"or here?"<<endl;
-    std::cout<<"************************************************"<<std::endl;
-    std::cout<<"IN LAPPDCFD:: channel: "<<channelno<<std::endl;
-    
+    if(CFDVerbosity>0){
+        std::cout<<"************************************************"<<std::endl;
+        std::cout<<"IN LAPPDCFD:: channel: "<<channelno<<std::endl;
+    }
 
     if(isSim){
       // If the data is simulated data, we loop over the true hits
@@ -130,8 +133,9 @@ bool LAPPDcfd::Execute(){
 
           // for each pulse on the Waveform find the time using CFD1 algorithm
           double cfdtime = CFD_Discriminator1(bwav.GetSamples(),Vpulses.at(j));
-          std::cout<<"for pulse #"<<j<<" (Q="<<(Vpulses.at(j)).GetCharge()<<",Amp="<<(Vpulses.at(j)).GetPeak()<<",LowRange="<<(Vpulses.at(j)).GetLowRange()<<",HiRange="<<(Vpulses.at(j)).GetHiRange()<<") "<<"  cfd_time="<<cfdtime<<std::endl;
-
+          if(CFDVerbosity>0){
+              std::cout<<"for pulse #"<<j<<" (Q="<<(Vpulses.at(j)).GetCharge()<<",Amp="<<(Vpulses.at(j)).GetPeak()<<",LowRange="<<(Vpulses.at(j)).GetLowRange()<<",HiRange="<<(Vpulses.at(j)).GetHiRange()<<") "<<"  cfd_time="<<cfdtime<<std::endl;
+          }
           // Store the reconstructed time in a new LAPPDPulse
           LAPPDPulse apulse(0,channelno,(cfdtime/1000.),(Vpulses.at(j)).GetCharge(),(Vpulses.at(j)).GetPeak(),(Vpulses.at(j)).GetLowRange(),(Vpulses.at(j)).GetHiRange());
           thepulses.push_back(apulse);
