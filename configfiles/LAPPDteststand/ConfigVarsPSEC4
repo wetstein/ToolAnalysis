@@ -19,6 +19,7 @@ SimInput  ./UserTools/LAPPDSim/pulsecharacteristics.root
 FileInput ../LAPPDdata_fff/LAPPD25_3.22.18/2400_2100_1300_bsln_2sided_root.fff
 
 #PSECReadIn
+PSECReadInVerbosity 0
 RawDataOutpuWavLabel  RawLAPPDData
 PSECinputfile Data_20201712_174129_X_-15._Y_-75.txt
 DoPedSubtraction 1
@@ -46,6 +47,7 @@ IntegLow  64000
 IntegHi 67000
 
 #LAPPDFindPeak
+FindPeakVerbosity 0
 FiltPeakInputWavLabel FiltLAPPDData
 RawPeakInputWavLabel LAPPDWaveforms
 BLSPeakInputWavLabel BLsubtractedLAPPDData
@@ -54,6 +56,7 @@ MinimumTot 1000.
 Deltat 100.
 
 # LAPPDcfd
+CFDVerbosity 0
 FiltCFDInputWavLabel FiltLAPPDData
 RawCFDInputWavLabel LAPPDWaveforms
 BLSCFDInputWavLabel BLsubtractedLAPPDData
@@ -73,5 +76,8 @@ path ./testoutput
 #NHistos 10
 
 #LAPPDCluster
+ClusterVerbosity  0
 SimpleClusterLabel SimpleRecoLAPPDPulses
 CFDClusterLabel CFDRecoLAPPDPulses
+
+ClusterTreeVerbosity  0
