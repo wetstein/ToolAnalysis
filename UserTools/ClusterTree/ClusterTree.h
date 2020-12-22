@@ -43,7 +43,7 @@ class ClusterTree: public Tool {
 
  private:
 
-
+    int ClusterTreeVerbosity;
 
 
 
