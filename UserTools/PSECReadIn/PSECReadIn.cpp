@@ -21,6 +21,11 @@ bool PSECReadIn::Initialise(std::string configfile, DataModel &data){
   m_variables.Get("Nboards", Nboards);
   m_variables.Get("Pedinputfile1", PedFileName1);
   m_variables.Get("Pedinputfile2", PedFileName2);
+    
+  TString OWL;
+  m_variables.Get("RawDataOutpuWavLabel",OWL);
+  OutputWavLabel = OWL;
+    
 
   //Opening data file
   DataFile.open(NewFileName);
@@ -45,7 +50,7 @@ bool PSECReadIn::Initialise(std::string configfile, DataModel &data){
   bool isCFD=false;
   m_data->Stores["ANNIEEvent"]->Header->Set("isCFD",isCFD);
     
-    PedestalValues = new std::map<unsigned long, vector<int>>;
+  PedestalValues = new std::map<unsigned long, vector<int>>;
     
   if(DoPedSubtract==1){
       ReadPedestals(0);
@@ -101,7 +106,7 @@ bool PSECReadIn::Execute(){
           if((location)%31==0)
           {
               acdcmetadata.push_back(stempValue);
-              //cout<<"yes "<< location<<endl;
+              //cout<<"yes "<< location<<" "<<stempValue<<endl;
               continue;
           }
           
@@ -160,7 +165,7 @@ bool PSECReadIn::Execute(){
       //cout<<"at the end"<<endl;
   }
     
-  m_data->Stores["ANNIEEvent"]->Set("LAPPDWaveforms",LAPPDWaveforms);
+  m_data->Stores["ANNIEEvent"]->Set(OutputWavLabel,LAPPDWaveforms);
   m_data->Stores["ANNIEEvent"]->Set("ACDCmetadata",acdcmetadata);
   LAPPDWaveforms->clear();
 
@@ -208,7 +213,7 @@ bool PSECReadIn::ReadPedestals(int boardNo){
         int tempValue; //current int in the line
 
         unsigned long channelNo=0; //channel number
-        //if(boardNo==1) { channelNo = 30; cout<<"NEW BOARD "<<channelNo<<" "<<sampleNo<<endl;}
+        if(boardNo==1) { channelNo = 30; cout<<"NEW BOARD "<<channelNo<<" "<<sampleNo<<endl;}
         
         //starts the loop at the beginning of the line
         while(iss >> stempValue)
