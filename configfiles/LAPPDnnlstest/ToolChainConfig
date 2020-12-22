@@ -3,13 +3,22 @@
 
 #Generate hits params
 nhits 100
+PathToPulsecharacteristics ./UserTools/LAPPDSim/pulsecharacteristics.root
+ArtificialEvent 0
+EventDisplay 0
+OutputFile testtestestest
+# in units of meters
+paracoord 0.05
+perpcoord 0.05
+randomizepositions 0
+trigtime 5.0
 
 #LAPPDSim params
-SimInput /docker_toolchain/data/pulsecharacteristics.root
+SimInput ./UserTools/LAPPDSim/pulsecharacteristics.root
 
 #WaveformNNLS configs
 rawdataname RawLAPPDData
-tempfilename /docker_toolchain/data/pulsecharacteristics.root
+tempfilename ./UserTools/LAPPDSim/pulsecharacteristics.root
 temphistname templatepulse #name of the TH1D in the template file
 sampling_factor 10 #larger number is smaller nnls matrices, 10 is pretty precise
 maxiter 20
@@ -17,7 +26,7 @@ maxiter 20
 
 # FTBFAnalysis and LAPPDDisplay configs
 EventDisplay 2
-OutputFile /docker_toolchain/data/nnlstest.root
+OutputFile nnlstest.root
 
 
 
@@ -42,6 +51,5 @@ service_kick_sec -1
 Tools_File configfiles/LAPPDnnlstest/ToolsConfig  ## list of tools to run and their config files
 
 ##### Run Type #####
-Inline 1 ## number of Execute steps in program, -1 infinite loop that is ended by user 
+Inline 1 ## number of Execute steps in program, -1 infinite loop that is ended by user
 Interactive 0 ## set to 1 if you want to run the code interactively
-
