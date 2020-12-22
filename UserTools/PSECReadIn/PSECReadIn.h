@@ -41,9 +41,10 @@ class PSECReadIn: public Tool {
     int NChannels;
     int Nsamples;
     int TrigChannel;
+    int PSECReadInVerbosity;
+    int eventNo;
     std::map<unsigned long, vector<Waveform<double>>>* LAPPDWaveforms;
-    std::map<unsigned long, vector<int>> *PedestalValues;
-
+    std::map<unsigned long, vector<int>> *PedestalValues;    
     streampos dataPosition;
 
 
