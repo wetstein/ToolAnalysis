@@ -15,6 +15,9 @@ bool ClusterTree::Initialise(std::string configfile, DataModel &data)
   nottf = new TFile("Analysis.root","RECREATE");
   fMyTree = new TTree("ffmytree","ffmytree");
 
+  m_variables.Get("ClusterTreeVerbosity",ClusterTreeVerbosity);
+
+    
   // set the branches
 
   fMyTree->Branch("NHits",            &NHits,             "NHits/I"               );
@@ -33,7 +36,7 @@ bool ClusterTree::Initialise(std::string configfile, DataModel &data)
 
 bool ClusterTree::Execute()
 {
- // cout<<"Cluster Tree Execute"<<endl;
+  if(ClusterTreeVerbosity>0) cout<<"Cluster Tree Execute"<<endl;
   nottf->cd();
   std::map<unsigned long,vector<LAPPDHit>> Hits;
   m_data->Stores["ANNIEEvent"]->Get("Clusters",Hits);
@@ -52,32 +55,32 @@ bool ClusterTree::Execute()
       int m=0;
       for (itrr = itr->second.begin(); itrr!= itr->second.end(); ++itrr)
       {
-          cout<<"GETTING INFO"<<endl;
+          //cout<<"GETTING INFO"<<endl;
           hT[m]=hitvect[m].GetTime();
           //  cout<<"GETTING INFO"<<endl;
           hQ[m]=hitvect[m].GetCharge();
           //  cout<<"GETTING INFO"<<endl;
           vector<double> localposition;
           localposition=hitvect[m].GetLocalPosition();
-          cout<<"Size of localposition "<< localposition.size()<<endl;
+          if(ClusterTreeVerbosity>1) cout<<"Size of localposition "<< localposition.size()<<endl;
           if(localposition.size()>0)
           {
               
               hxpar[m]=localposition[0];
               //      cout<<"GETTING INFO"<<endl;
               hxperp[m]=localposition[1];
-              cout<<"Position in ClusterTree "<<hxpar[m]<<" "<<hxperp[m]<<endl;
+              if(ClusterTreeVerbosity>1) cout<<"Position in ClusterTree "<<hxpar[m]<<" "<<hxperp[m]<<endl;
           }
           
           //    cout<<"GETTING INFO"<<endl;
           htime[m]=hitvect[m].GetTime();
           m++;
       }
-    cout<<"FILLING TREE WITH HITS"<<endl;
+    if(ClusterTreeVerbosity>1)cout<<"FILLING TREE WITH HITS"<<endl;
     fMyTree->Fill();
 
     }
-    //cout<<"Is this working? 2"<<endl;
+    if(ClusterTreeVerbosity>0) cout<<"End ClusterTree..............................."<<endl;
 
   return true;
 }
