@@ -30,18 +30,18 @@ bool LAPPDBaselineSubtract::Initialise(std::string configfile, DataModel &data){
 bool LAPPDBaselineSubtract::Execute(){
     bool isBLsub=true;
     m_data->Stores["ANNIEEvent"]->Set("isBLsubtracted",isBLsub);
-    cout<<"made it to here"<<endl;
-  Waveform<double> bwav;
+    cout<<"made it to here "<<BLSInputWavLabel<<endl;
+    Waveform<double> bwav;
 
   // get raw lappd data
-  std::map<int,vector<Waveform<double>>> rawlappddata;
-  m_data->Stores["ANNIEEvent"]->Get("RawLAPPDData",rawlappddata);
+    std::map<unsigned long,vector<Waveform<double>>> lappddata;
+    m_data->Stores["ANNIEEvent"]->Get(BLSInputWavLabel,lappddata);
     cout<< "did it get to this"<<endl;
-  // the filtered Waveform
-  std::map<int,vector<Waveform<double>>> blsublappddata;
+    // the filtered Waveform
+    std::map<unsigned long,vector<Waveform<double>>> blsublappddata;
 
-  map <int, vector<Waveform<double>>> :: iterator itr;
-  for (itr = rawlappddata.begin(); itr != rawlappddata.end(); ++itr){
+  map <unsigned long, vector<Waveform<double>>> :: iterator itr;
+  for (itr = lappddata.begin(); itr != lappddata.end(); ++itr){
     int channelno = itr->first;
     vector<Waveform<double>> Vwavs = itr->second;
     vector<Waveform<double>> Vfwavs;
@@ -50,7 +50,29 @@ bool LAPPDBaselineSubtract::Execute(){
     for(int i=0; i<Vwavs.size(); i++){
 
         Waveform<double> bwav = Vwavs.at(i);
-        Waveform<double> blswav = SubtractSine(bwav);
+        
+        // This is from back when we had a sinusoidal pedestal
+        //Waveform<double> blswav = SubtractSine(bwav);
+        
+        // Loop over first N samples and get average value
+        if(LowBLfitrange>DimSize || HiBLfitrange>DimSize){
+            cout<<"BASELINE FITRANGE IS WRONG!!! "<<LowBLfitrange<<" "<<HiBLfitrange<<endl;
+            LowBLfitrange=0;
+            HiBLfitrange=1;
+        }
+        
+        double BLval=0;
+        for(int j=LowBLfitrange; j<HiBLfitrange; j++){
+            BLval+=bwav.GetSamples()->at(j);
+        }
+        double AvgBL = BLval/((double)(HiBLfitrange-LowBLfitrange));
+
+        Waveform<double> blswav;
+        for(int k=0; k<bwav.GetSamples()->size(); k++){
+            blswav.PushSample((bwav.GetSamples()->at(k))-AvgBL);
+        }
+
+
         Vfwavs.push_back(blswav);
       }
 
