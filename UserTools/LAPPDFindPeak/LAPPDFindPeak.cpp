@@ -12,6 +12,8 @@ bool LAPPDFindPeak::Initialise(std::string configfile, DataModel &data){
   m_data= &data; //assigning transient data pointer
   /////////////////////////////////////////////////////////////////
 
+   m_data->Stores["ANNIEEvent"]->Header->Get("AnnieGeometry", _geom);
+    
   TString FPIWL;
   m_variables.Get("FiltPeakInputWavLabel",FPIWL);
   FiltPeakInputWavLabel = FPIWL;
@@ -24,14 +26,16 @@ bool LAPPDFindPeak::Initialise(std::string configfile, DataModel &data){
   m_variables.Get("TotThreshold", TotThreshold);
   m_variables.Get("MinimumTot", MinimumTot);
   m_variables.Get("Deltat", Deltat);
-
+  m_variables.Get("FindPeakVerbosity",FindPeakVerbosity);
+    
+    
   return true;
 }
 
 
 bool LAPPDFindPeak::Execute(){
 
-  std::cout<<"in FindPeak"<<std::endl;
+    if(FindPeakVerbosity>0){ std::cout<<"in FindPeak...Begin"<<std::endl; }
     bool isBLsub;
     m_data->Stores["ANNIEEvent"]->Get("isBLsubtracted",isBLsub);
     bool isFiltered;
@@ -76,14 +80,14 @@ bool LAPPDFindPeak::Execute(){
         Waveform<double> bwav = Vwavs.at(i);
         thepulses = FindPulses_TOT(bwav.GetSamples());
 
-        /*
-        std::cout<<"The number of peaks for channel "<<channelno
-                 <<", wavform "<<i<<" is: "<<thepulses.size()<<"   ";
-        for(int j=0; j<thepulses.size(); j++){
-          std::cout<<"...for pulse #"<<j<<" (Q="<<(thepulses.at(j)).GetCharge()<<",LowRange="<<(thepulses.at(j)).GetLowRange()<<",HiRange="<<(thepulses.at(j)).GetHiRange()<<") ";
+        if(FindPeakVerbosity==2){
+            std::cout<<"The number of peaks for channel "<<channelno
+                    <<", wavform "<<i<<" is: "<<thepulses.size()<<"   ";
+            for(int j=0; j<thepulses.size(); j++){
+                std::cout<<"...for pulse #"<<j<<" (Q="<<(thepulses.at(j)).GetCharge()<<",LowRange="<<(thepulses.at(j)).GetLowRange()<<",HiRange="<<(thepulses.at(j)).GetHiRange()<<") ";
+            }
+            std::cout<<" "<<std::endl;
         }
-        std::cout<<" "<<std::endl;
-        */
     }
     if(thepulses.size()>0)
       {
@@ -91,15 +95,17 @@ bool LAPPDFindPeak::Execute(){
         SimpleRecoLAPPDPulses.insert(pair <unsigned long,vector<LAPPDPulse>> (channelno,thepulses));
       }       
   }
-    cout<<SimpleRecoLAPPDPulses.size()<<" In LAPPDFINDPEAK"<<endl;
   m_data->Stores["ANNIEEvent"]->Set("SimpleRecoLAPPDPulses",SimpleRecoLAPPDPulses);
 
-  //std::cout<<"Done Finding Peaks..............................."<<std::endl;
-  //std::cout<<" "<<std::endl;
-  //std::cout<<"did i get from store "<<testval<<std::endl;
-  //int tracesize = bwav.GetSamples()->size();
-  //std::cout<<"trace size: "<<tracesize<<std::endl;
-/*
+  if(FindPeakVerbosity>0){
+      cout<<SimpleRecoLAPPDPulses.size()<<" In LAPPDFINDPEAK"<<endl;
+      std::cout<<"Done Finding Peaks..............................."<<std::endl;
+      //std::cout<<" "<<std::endl;
+      //std::cout<<"did i get from store "<<testval<<std::endl;
+      //int tracesize = bwav.GetSamples()->size();
+      //std::cout<<"trace size: "<<tracesize<<std::endl;
+  }
+      /*
   double themax=0;
   int maxbin=0;
 
@@ -120,8 +126,6 @@ bool LAPPDFindPeak::Execute(){
   m_data->Stores["ANNIEEvent"]->Set("peakmin",themin);
   m_data->Stores["ANNIEEvent"]->Set("minbin",minbin);
 */
-
-    cout<<"End of LAPPDFindPeak"<<endl;
 
   return true;
 }
@@ -173,7 +177,7 @@ std::vector<LAPPDPulse> LAPPDFindPeak::FindPulses_TOT(std::vector<double> *theWa
                 npeaks++; length = 0; hi=(double)i;
                 tc= (low * Deltat)/1000.;
                 LAPPDPulse apulse(0,0,tc,Q,peak,low,hi);
-                cout<<"pulse parameters:  t="<<tc<<" Q="<<Q<<" peak="<<peak<<" low="<<low<<" hi="<<hi<<endl;
+                if(FindPeakVerbosity>2) cout<<"pulse parameters:  t="<<tc<<" Q="<<Q<<" peak="<<peak<<" low="<<low<<" hi="<<hi<<endl;
                 thepulses.push_back(apulse);
                 pulsestarted=false;
                 peak=0; Q=0; low=0; hi=0;
