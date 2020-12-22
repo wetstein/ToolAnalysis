@@ -53,6 +53,7 @@ class LAPPDPlotWaveForms: public Tool {
     bool isSim;
     bool isBLsub;
     int chno;
+    Geometry* _geom;
 
 
 
