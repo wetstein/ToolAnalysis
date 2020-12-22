@@ -91,6 +91,7 @@ bool LAPPDPlotWaveForms::Execute(){
             Waveform<double> bwav = Vwavs.at(i);
             
             int nbins = bwav.GetSamples()->size();
+            //cout<<"IN PLOT WAVES "<<channelno<<" "<<nbins<<endl;
             double starttime=0.;
             double endtime = starttime + ((double)nbins)*100.;
             
