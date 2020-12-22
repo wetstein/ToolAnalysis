@@ -36,6 +36,7 @@ class PSECReadIn: public Tool {
     ifstream PedFile;
     string PedFileName1;
     string PedFileName2;
+    string OutputWavLabel;
     int DoPedSubtract;
     int NChannels;
     int Nsamples;
