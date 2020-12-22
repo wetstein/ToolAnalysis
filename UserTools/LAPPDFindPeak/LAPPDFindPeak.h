@@ -29,7 +29,8 @@ class LAPPDFindPeak: public Tool {
   double TotThreshold;
   double MinimumTot;
   double Deltat;
-
+  int FindPeakVerbosity;
+  Geometry* _geom;
 
 
 };
