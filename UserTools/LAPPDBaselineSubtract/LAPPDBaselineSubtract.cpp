@@ -30,13 +30,13 @@ bool LAPPDBaselineSubtract::Initialise(std::string configfile, DataModel &data){
 bool LAPPDBaselineSubtract::Execute(){
     bool isBLsub=true;
     m_data->Stores["ANNIEEvent"]->Set("isBLsubtracted",isBLsub);
-    cout<<"made it to here "<<BLSInputWavLabel<<endl;
+    //cout<<"made it to here "<<BLSInputWavLabel<<endl;
     Waveform<double> bwav;
 
   // get raw lappd data
     std::map<unsigned long,vector<Waveform<double>>> lappddata;
     m_data->Stores["ANNIEEvent"]->Get(BLSInputWavLabel,lappddata);
-    cout<< "did it get to this"<<endl;
+    //cout<< "did it get to this"<<endl;
     // the filtered Waveform
     std::map<unsigned long,vector<Waveform<double>>> blsublappddata;
 
