@@ -29,6 +29,7 @@ class LAPPDReorderData: public Tool {
 
  private:
 
+  int delayoffset;
   string InputWavLabel;
   string OutputWavLabel;
 
