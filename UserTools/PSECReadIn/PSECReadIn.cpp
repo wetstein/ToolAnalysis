@@ -24,11 +24,11 @@ bool PSECReadIn::Initialise(std::string configfile, DataModel &data){
   PSECReadInVerbosity=0;
   m_variables.Get("PSECReadInVerbosity",PSECReadInVerbosity);
 
-    
+
   TString OWL;
   m_variables.Get("RawDataOutpuWavLabel",OWL);
   OutputWavLabel = OWL;
-    
+
 
   //Opening data file
   DataFile.open(NewFileName);
@@ -39,12 +39,12 @@ bool PSECReadIn::Initialise(std::string configfile, DataModel &data){
   }
   cout<<"Opened file: "<<NewFileName<<endl;
 
-    
+
   //getting detais from the config file
   m_variables.Get("Nsamples", Nsamples);
   m_variables.Get("NChannels", NChannels);
   m_variables.Get("TrigChannel", TrigChannel);
-    
+
   //since unsure if LAPPDFilter, LAPPDBaselineSubtract, or LAPPDcfd are being used, isFiltered, isBLsub, and isCFD are set to false
   bool isFiltered = false;
   m_data->Stores["ANNIEEvent"]->Header->Set("isFiltered",isFiltered);
@@ -52,39 +52,39 @@ bool PSECReadIn::Initialise(std::string configfile, DataModel &data){
   m_data->Stores["ANNIEEvent"]->Header->Set("isBLsubtracted",isBLsub);
   bool isCFD=false;
   m_data->Stores["ANNIEEvent"]->Header->Set("isCFD",isCFD);
-    
+
   PedestalValues = new std::map<unsigned long, vector<int>>;
-    
+
   if(DoPedSubtract==1){
       ReadPedestals(0);
       if(Nboards==2) ReadPedestals(1);
   }
-  
+
   eventNo=0; //event number
-    
+
   cout<<"PEDSIZES: "<<PedestalValues->size()<<" "<<PedestalValues->at(0).size()<<" "<<PedestalValues->at(4).at(5)<<endl;
-    
+
   return true;
 }
 
 
 bool PSECReadIn::Execute(){
   //create raw lappd object
-  
-    
+
+
   if(eventNo%10==0) cout<<"Event: "<<eventNo<<endl;
-    
+
   if(PSECReadInVerbosity>0) cout<<"BEGIN PSECReadIn "<< endl;
-    
+
   LAPPDWaveforms = new std::map<unsigned long, vector<Waveform<double>>>;
-    
+
   //create a waveform for temp storage
- 
-  
+
+
   string nextLine; //temp line to parse
-    
+
   map <unsigned long, vector<Waveform<double>>> :: iterator itr;
-  
+
   vector<string> acdcmetadata;
   while(getline(DataFile, nextLine))
   {
@@ -101,21 +101,21 @@ bool PSECReadIn::Execute(){
           location++;
           //  cout<<location<<endl;
           //when location==0, it is at the sample number
-          
+
           //cout<<"beginning "<<stempValue<<endl;
-          
+
           if(location==0)
           {
               sampleNo = stoi(stempValue, 0, 10);
-              
+
               //(int)strtol(tempValue, NULL, 16);
               //cout<<"SAMPLE: "<<sampleNo<<endl;
               //sampleNo=tempValue;
               continue;
           }
-          
+
           if(PSECReadInVerbosity>1) {cout<<"PARSING 30 Channels for sample: "<<sampleNo<<endl;}
-          
+
           //this is the meta data per format
           if((location)%31==0)
           {
@@ -123,7 +123,7 @@ bool PSECReadIn::Execute(){
               if(PSECReadInVerbosity>1) { cout<<"parsing metadata at column: "<< location<<" "<<stempValue<<endl;}
               continue;
           }
-          
+
           int tempValue = stoi(stempValue, 0, 10);
 
           int theped;
@@ -132,10 +132,10 @@ bool PSECReadIn::Execute(){
               pitr = PedestalValues->find(channelNo);
               theped = (pitr->second).at(sampleNo);
           } else theped = 0;
-          
+
           if(PSECReadInVerbosity>1 && theped==0) cout<<"THE PED = 0!!!!!!!! "<<theped<<" "<<channelNo<<" "<<sampleNo<<" "<<PedestalValues->count(channelNo)<<endl;
           int pedsubValue = tempValue - theped;
-          
+
           if(sampleNo==0)
           {
               Waveform<double> tempwav;
@@ -157,10 +157,10 @@ bool PSECReadIn::Execute(){
               (((LAPPDWaveforms->find(channelNo))->second).at(0)).PushSample(0.3*((double)pedsubValue));
               if(PSECReadInVerbosity>2) {cout<<"SUBSEQUENT SAMPLES: "<<eventNo<<" "<<sampleNo<<" "<<channelNo<<" "<<tempValue<<endl;}
           }
-        
+
         channelNo++;
       }
-      
+
       //when the sampleNo gets to ff
       //it is at sample 256 and needs to go to the next event
       //if(sampleNo=='ff')
@@ -170,20 +170,20 @@ bool PSECReadIn::Execute(){
           //eventNo++;
           break;
       }
-      
+
       //cout<<"at the end"<<endl;
   }
-  
+
     if(PSECReadInVerbosity>0) {
-        cout<<"END PSECReadIn...acdcmetadata size: "<<acdcmetadata.size()<<"   LAPPDWaveforms size: "<<LAPPDWaveforms->size()<<endl;
+        cout<<"END PSECReadIn...acdcmetadata size: "<<acdcmetadata.size()<<"   LAPPDWaveforms size: "<<(((LAPPDWaveforms->find(0))->second).at(0)).GetSamples()->size()<<endl;
         cout<<"*************************************************************"<<endl;
     }
-    
+
   m_data->Stores["ANNIEEvent"]->Set(OutputWavLabel,LAPPDWaveforms);
   m_data->Stores["ANNIEEvent"]->Set("ACDCmetadata",acdcmetadata);
   LAPPDWaveforms->clear();
   eventNo++;
-    
+
   return true;
 }
 
@@ -197,10 +197,10 @@ bool PSECReadIn::Finalise(){
 bool PSECReadIn::ReadPedestals(int boardNo){
 
     cout<<"Getting Pedestals "<<boardNo<<endl;
-    
+
     string nextLine; //temp line to parse
     double finalsampleNo;
-    
+
     if(boardNo==0){
         PedFile.open(PedFileName1);
         if(!PedFile.is_open())
@@ -218,7 +218,7 @@ bool PSECReadIn::ReadPedestals(int boardNo){
         }
         cout<<"Opened file: "<<PedFileName2<<endl;
     }
-    
+
     int sampleNo=0; //sample number
     while(getline(PedFile, nextLine))
     {
@@ -229,12 +229,12 @@ bool PSECReadIn::ReadPedestals(int boardNo){
 
         unsigned long channelNo=0; //channel number
         if(boardNo==1) { channelNo = 30; cout<<"NEW BOARD "<<channelNo<<" "<<sampleNo<<endl;}
-        
+
         //starts the loop at the beginning of the line
         while(iss >> stempValue)
         {
             location++;
-            
+
             int tempValue = stoi(stempValue, 0, 10);
 
             if(sampleNo==0){
@@ -248,10 +248,10 @@ bool PSECReadIn::ReadPedestals(int boardNo){
                 //cout<<"Following time: "<<channelNo<<" "<<tempValue<<"    F    "<<PedestalValues->count(channelNo)<<endl;
                 (((PedestalValues->find(channelNo))->second)).push_back(tempValue);
             }
-                    
+
             channelNo++;
         }
-    
+
         sampleNo++;
         //when the sampleNo gets to ff
         //it is at sample 256 and needs to go to the next event
@@ -262,11 +262,11 @@ bool PSECReadIn::ReadPedestals(int boardNo){
         //    eventNo++;
         //    break;
         //}
-        
+
         //cout<<"at the end"<<endl;
     }
-    
-    cout<<"FINAL SAMPLE NUMBER: "<<PedestalValues->size()<<" "<<PedestalValues->at(0).size()<<endl;
+
+    cout<<"FINAL SAMPLE NUMBER: "<<PedestalValues->size()<<" "<<(((PedestalValues->find(0))->second)).size()<<endl;
     PedFile.close();
   return true;
 }
@@ -275,6 +275,6 @@ bool PSECReadIn::ReadPedestals(int boardNo){
 bool PSECReadIn::MakePedestals(){
 
   //Empty for now...
-    
+
   return true;
 }
