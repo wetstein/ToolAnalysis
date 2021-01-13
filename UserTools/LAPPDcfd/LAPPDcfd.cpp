@@ -85,7 +85,7 @@ bool LAPPDcfd::Execute(){
 
   // Loop over all channels
   map<unsigned long, vector<LAPPDPulse>>:: iterator p;
- 
+
   for (p = SimpleRecoLAPPDPulses.begin(); p != SimpleRecoLAPPDPulses.end(); ++p){
    // cout<<"In loop of channels"<<endl;
     // Get the channel number and a vector of pulses
@@ -141,7 +141,7 @@ bool LAPPDcfd::Execute(){
           thepulses.push_back(apulse);
         }
       }
-      
+
         //std::cout<<" "<<std::endl;
         // Put the newly reconsructed LAPPDPulses into a map, by channel
         CFDRecoLAPPDPulses.insert(pair <unsigned long,vector<LAPPDPulse>> (channelno,thepulses));
@@ -151,7 +151,7 @@ bool LAPPDcfd::Execute(){
     m_data->Stores["ANNIEEvent"]->Set("CFDRecoLAPPDPulses",CFDRecoLAPPDPulses);
 
     //cout<<"gGJDKLJ"<<endl;
-    
+
   return true;
 }
 
@@ -164,6 +164,9 @@ bool LAPPDcfd::Finalise(){
 
 double	LAPPDcfd::CFD_Discriminator1(std::vector<double>* trace, LAPPDPulse pulse) {
 
+  double deltaT;
+  m_data->Stores["ANNIEEvent"]->Set("deltaT",deltaT);
+
   double amp = pulse.GetPeak();
   double time = 0;
   // this should be a global variable that gets set from a config...
@@ -171,6 +174,8 @@ double	LAPPDcfd::CFD_Discriminator1(std::vector<double>* trace, LAPPDPulse pulse
   double eps = 1e-2;
   double FitWindow_min = (pulse.GetLowRange()-5)*100.;
   double FitWindow_max = (pulse.GetHiRange()+5)*100.;
+
+  if(CFDVerbosity>0) cout<<"Low Range: "<<pulse.GetLowRange()<<" Hi Range: "<<pulse.GetHiRange()<<" FitWindow_min: "<<FitWindow_min<<" FitWindow_max: "<<FitWindow_max<<endl;
 
   double PointsPerSpline = 5;
 
@@ -180,16 +185,19 @@ double	LAPPDcfd::CFD_Discriminator1(std::vector<double>* trace, LAPPDPulse pulse
   double starttime=0.;
   double endtime = starttime + ((double)nbins)*100.;
   TH1D* hwav = new TH1D("hwav","hwav",nbins,starttime,endtime);
-
+  TH1D* hwav_range = new TH1D("hwav_range","hwav_range",nbins,starttime,endtime);
   for(int i=0; i<nbins; i++){
     hwav->SetBinContent(i+1,-trace->at(i));
+    if( (((double)i*100.)>FitWindow_min) && (((double)i*100.)<FitWindow_max) ) hwav_range->SetBinContent(i+1,-trace->at(i));
+    else hwav_range->SetBinContent(i+1,0.);
   }
 
 //	int bin = pulse.GetTpsec();
 //		while(fsplinewav->V(hwav->GetBinCenter(bin))<=th) {bin--;}
 	double xlow = FitWindow_min;
-//	double xhigh = hwav->GetBinCenter(bin);
-  double xhigh = FitWindow_max;
+  //double xhigh = hwav->GetBinCenter(bin);
+  double xhigh = hwav->GetBinCenter(hwav->GetMaximumBin());
+  //double xhigh = FitWindow_max;
 	double xmid = (xlow+xhigh)/2;
 
   if(hwav->Interpolate(xmid)-th==0) time = xmid;
@@ -207,8 +215,9 @@ double	LAPPDcfd::CFD_Discriminator1(std::vector<double>* trace, LAPPDPulse pulse
     xlow = xmid;
   }
 
-  time = xlow;
+  time = xlow + deltaT;
   delete hwav;
+  delete hwav_range;
 	return time;
 }
 
