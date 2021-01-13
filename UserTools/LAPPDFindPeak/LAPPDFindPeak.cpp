@@ -12,8 +12,8 @@ bool LAPPDFindPeak::Initialise(std::string configfile, DataModel &data){
   m_data= &data; //assigning transient data pointer
   /////////////////////////////////////////////////////////////////
 
-   m_data->Stores["ANNIEEvent"]->Header->Get("AnnieGeometry", _geom);
-    
+  m_data->Stores["ANNIEEvent"]->Header->Get("AnnieGeometry", _geom);
+
   TString FPIWL;
   m_variables.Get("FiltPeakInputWavLabel",FPIWL);
   FiltPeakInputWavLabel = FPIWL;
@@ -27,8 +27,8 @@ bool LAPPDFindPeak::Initialise(std::string configfile, DataModel &data){
   m_variables.Get("MinimumTot", MinimumTot);
   m_variables.Get("Deltat", Deltat);
   m_variables.Get("FindPeakVerbosity",FindPeakVerbosity);
-    
-    
+
+
   return true;
 }
 
@@ -62,6 +62,9 @@ bool LAPPDFindPeak::Execute(){
   //bool testval =  m_data->Stores["ANNIEEvent"]->Get("RawLAPPDData",lappddata);
   //cout<<FiltPeakInputWavLabel<<" HElp "<<lappddata.size()<<endl;
 
+
+  //cout<<"Channel Number: "<<5<<" is Strip number: "<<endl;
+
   // make reconstructed pulses
   std::map<unsigned long,vector<LAPPDPulse>> SimpleRecoLAPPDPulses;
 
@@ -70,6 +73,9 @@ bool LAPPDFindPeak::Execute(){
   for (itr = lappddata.begin(); itr != lappddata.end(); ++itr){
     unsigned long channelno = itr->first;
     vector<Waveform<double>> Vwavs = itr->second;
+
+    Channel* mychannel= _geom->GetChannel(channelno);
+    int stripno = mychannel->GetStripNum();
 
   // cout<<"channel= "<<channelno<<endl;
 
@@ -80,20 +86,21 @@ bool LAPPDFindPeak::Execute(){
         Waveform<double> bwav = Vwavs.at(i);
         thepulses = FindPulses_TOT(bwav.GetSamples());
 
-        if(FindPeakVerbosity==2){
-            std::cout<<"The number of peaks for channel "<<channelno
-                    <<", wavform "<<i<<" is: "<<thepulses.size()<<"   ";
+
+        if(FindPeakVerbosity>0){
+            if(FindPeakVerbosity>1) std::cout<<"The number of peaks for channel "<<channelno
+                    <<", stripnum: "<< stripno <<", wavform "<<i<<" is: "<<thepulses.size()<<"   ";
             for(int j=0; j<thepulses.size(); j++){
-                std::cout<<"...for pulse #"<<j<<" (Q="<<(thepulses.at(j)).GetCharge()<<",LowRange="<<(thepulses.at(j)).GetLowRange()<<",HiRange="<<(thepulses.at(j)).GetHiRange()<<") ";
+                std::cout<<"...for pulse #"<<j<<" (Q="<<(thepulses.at(j)).GetCharge()<<",LowRange="<<(thepulses.at(j)).GetLowRange()<<",HiRange="<<(thepulses.at(j)).GetHiRange()<<",time="<<(thepulses.at(j)).GetTime()<<") "<<std::endl;
             }
-            std::cout<<" "<<std::endl;
+            if(FindPeakVerbosity>1) std::cout<<" "<<std::endl;
         }
     }
     if(thepulses.size()>0)
       {
           //cout<<channelno<<" Channel with pulses in FindPeak"<<endl;
         SimpleRecoLAPPDPulses.insert(pair <unsigned long,vector<LAPPDPulse>> (channelno,thepulses));
-      }       
+      }
   }
   m_data->Stores["ANNIEEvent"]->Set("SimpleRecoLAPPDPulses",SimpleRecoLAPPDPulses);
 
