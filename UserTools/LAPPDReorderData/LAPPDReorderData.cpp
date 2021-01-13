@@ -17,9 +17,11 @@ bool LAPPDReorderData::Initialise(std::string configfile, DataModel &data){
     InputWavLabel = IWL;
     m_variables.Get("ReorderOutputWavLabel",OWL);
     OutputWavLabel = OWL;
-    
-    
-    
+
+    m_variables.Get("DelayOffset",delayoffset);
+
+
+
   return true;
 }
 
@@ -40,49 +42,51 @@ bool LAPPDReorderData::Execute(){
     int meta26_2 = stoi(Smeta26_2, 0, 16);
 
     //cout<<"REORDER TIME!!!!   "<<acdcmetadata.size()<<" "<<acdcmetadata.at(52)<<" "<<acdcmetadata.at(53)<<" "<<meta26_1<<" "<<meta26_2<<endl;
-    
+
     map <unsigned long, vector<Waveform<double>>> :: iterator itr;
 
     for (itr = lappddata.begin(); itr != lappddata.end(); ++itr){
       unsigned long channelno = itr->first;
       vector<Waveform<double>> Vwavs = itr->second;
-    
-        
+
+
         int switchbit=0;
         if(channelno<30) switchbit = meta26_1*32;
         else switchbit = meta26_2*32;
-        
+
+        switchbit+=delayoffset;
+
         // cout<<"channel= "<<channelno<<endl;
 
         vector<Waveform<double>> Vrwav;
-        
+
         //loop over all Waveforms
         for(int i=0; i<Vwavs.size(); i++){
 
             Waveform<double> bwav = Vwavs.at(i);
             Waveform<double> rwav;
 
-            
+
             for(int j=0; j< bwav.GetSamples()->size(); j++){
-                
-                if(switchbit>255) switchbit=0;
+
+                if(switchbit>255 || switchbit<0) switchbit=0;
                 double nsamp = bwav.GetSamples()->at(switchbit);
                 rwav.PushSample(nsamp);
                 switchbit++;
-                
+
             }
-            
+
             Vrwav.push_back(rwav);
         }
-        
-        reordereddata.insert(pair<unsigned long, vector<Waveform<double>>>(channelno,Vrwav));
-    
+
+        reordereddata.insert(pair<unsigned long, vector<Waveform<double>>>(1000+channelno,Vrwav));
+
     }
-        
-        
+
+
     m_data->Stores["ANNIEEvent"]->Set(OutputWavLabel,reordereddata);
 
-    
+
   return true;
 }
 
