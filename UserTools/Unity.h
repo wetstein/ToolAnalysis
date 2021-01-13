@@ -109,3 +109,6 @@
 #include "PSECReadIn.h"
 #include "LAPPDPlotWaveForms.h"
 #include "LAPPDReorderData.h"
+#include "LAPPDHitTree.h"
+#include "LAPPDMakePeds.h"
+#include "LAPPDFindT0.h"
