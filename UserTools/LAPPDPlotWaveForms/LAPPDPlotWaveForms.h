@@ -39,7 +39,7 @@ class LAPPDPlotWaveForms: public Tool {
     int miter;
 
     string InputWavLabel;
-    
+
     //TTree* outtree;
     int NChannel;
     int TrigChannel;
@@ -52,7 +52,9 @@ class LAPPDPlotWaveForms: public Tool {
     bool isIntegrated;
     bool isSim;
     bool isBLsub;
+    bool SaveByChannel;
     int chno;
+    TH1D* PHD;
     Geometry* _geom;
 
 
