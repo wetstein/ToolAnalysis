@@ -15,13 +15,16 @@ TankPMTGeoFile ./configfiles/LoadGeometry/FullTankPMTGeometry.csv
 # LAPPDSim
 SimInput  ./UserTools/LAPPDSim/pulsecharacteristics.root
 
-# LAPPDParseScope
-FileInput ../LAPPDdata_fff/LAPPD25_3.22.18/2400_2100_1300_bsln_2sided_root.fff
-
 #PSECReadIn
 PSECReadInVerbosity 0
 RawDataOutpuWavLabel  RawLAPPDData
-PSECinputfile Data_20201712_174129_X_-15._Y_-75.txt
+#PSECinputfile ../Data/2020-12-19/scan8x8_20201219/ALLData_5k_X_10_Y_10.txt
+#PSECinputfile ../Data/2020-12-29/975V_perMCP_trig_sparechannel/all.txt
+#PSECinputfile ../Data/2020-01-05/975V_perMCP_trig_sparechannel_20210105/all.txt
+PSECinputfile ../Data/2021-01-07/975V_perMCP_trigspare/all.txt
+
+975V_perMCP_trig_sparechannel_20210105/all.txt
+#Data_20201712_174129_X_-15._Y_-75.txt
 DoPedSubtraction 1
 Nboards 2
 Pedinputfile1 PEDS_ACDC_board0.txt
@@ -30,28 +33,46 @@ Pedinputfile2 PEDS_ACDC_board1.txt
 #LAPPDReorderData
 ReorderInputWavLabel RawLAPPDData
 ReorderOutputWavLabel LAPPDWaveforms
+DelayOffset 0
 
 #LAPPDBaselineSubtract
 BLSInputWavLabel LAPPDWaveforms
-LowBLfitrange 1;
-HiBLfitrange  41;
+LowBLfitrange 2;
+HiBLfitrange  27;
+
+#LAPPDFindT0
+FindT0Verbosity 0
+FindT0InputWavLabel BLsubtractedLAPPDData
+FindT0OutputWavLabel AlignedLAPPDData
+TrigEarlyCut 27
+TrigLateCut 40
+T0channelNo 1005
+T0signalmax 100.
+T0signalthreshold 40.
+T0offset  58
 
 #LAPPDFilter
 RawFilterInputWavLabel LAPPDWaveforms
-BLSFilterInputWavLabel BLsubtractedLAPPDData
+#BLSFilterInputWavLabel BLsubtractedLAPPDData
+BLSFilterInputWavLabel AlignedLAPPDData
 doFilter false
 CutoffFrequency 500000000
 
 #LAPPDIntegratePulse
-IntegLow  64000
-IntegHi 67000
+IntegStrip1 11
+IntegStrip2 -1
+IntegStrip3 -1
+IntegStrip4 -1
+IntegLow  4500
+IntegHi 9000
 
 #LAPPDFindPeak
 FindPeakVerbosity 0
 FiltPeakInputWavLabel FiltLAPPDData
 RawPeakInputWavLabel LAPPDWaveforms
-BLSPeakInputWavLabel BLsubtractedLAPPDData
-TotThreshold 0.5
+#BLSPeakInputWavLabel BLsubtractedLAPPDData
+BLSPeakInputWavLabel AlignedLAPPDData
+TotThreshold 3.0
 MinimumTot 1000.
 Deltat 100.
 
@@ -59,13 +80,15 @@ Deltat 100.
 CFDVerbosity 0
 FiltCFDInputWavLabel FiltLAPPDData
 RawCFDInputWavLabel LAPPDWaveforms
-BLSCFDInputWavLabel BLsubtractedLAPPDData
-Fraction_CFD 0.4
+#BLSCFDInputWavLabel BLsubtractedLAPPDData
+BLSCFDInputWavLabel AlignedLAPPDData
+Fraction_CFD 0.15
 
 #LAPPDPlotWaveForms
+SaveByChannel false
 PlotWavLabel FiltLAPPDData
-outfile WaveForms.root
-NHistos 10
+outfile WaveForms_filt.root
+NHistos 200
 
 # LAPPDSave
 path ./testoutput
@@ -80,4 +103,5 @@ ClusterVerbosity  0
 SimpleClusterLabel SimpleRecoLAPPDPulses
 CFDClusterLabel CFDRecoLAPPDPulses
 
+#LAPPDClusterTree
 ClusterTreeVerbosity  0
