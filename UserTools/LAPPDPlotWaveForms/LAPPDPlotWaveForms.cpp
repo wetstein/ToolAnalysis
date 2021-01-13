@@ -13,13 +13,12 @@ bool LAPPDPlotWaveForms::Initialise(std::string configfile, DataModel &data){
   /////////////////////////////////////////////////////////////////
 
     m_data->Stores["ANNIEEvent"]->Header->Get("AnnieGeometry", _geom);
-    
+
     TString IWL;
     //RawInputWavLabel;
     m_variables.Get("PlotWavLabel",IWL);
     InputWavLabel = IWL;
-    
-    
+
     // setup the output files
     TString OutFile = "lapptraces.root";     //default input file
     m_variables.Get("outfile", OutFile);
@@ -27,7 +26,7 @@ bool LAPPDPlotWaveForms::Initialise(std::string configfile, DataModel &data){
     mtf->mkdir("wavs");
     //tf->mkdir("filteredwavs");
     //tf->mkdir("blswavs");
-    
+
     isFiltered=false;
     isBLsub=false;
 
@@ -36,14 +35,16 @@ bool LAPPDPlotWaveForms::Initialise(std::string configfile, DataModel &data){
     bool ibl = m_data->Stores["ANNIEEvent"]->Header->Get("isBLsubtracted",isBLsub);
     bool iI = m_data->Stores["ANNIEEvent"]->Header->Get("isIntegrated",isIntegrated);
     bool isim = m_data->Stores["ANNIEEvent"]->Header->Get("isSim",isSim);
-    
+
     // keep count of the loop number (starting from 0)
     miter=0;
-    
+
     m_variables.Get("NHistos", NHistos);
     m_variables.Get("SampleSize",Deltat);
+    m_variables.Get("SaveByChannel",SaveByChannel);
 
-    
+    PHD = new TH1D("PHD","PHD",1000,-1e5,1e7);
+
     // declare the histograms
     /*
     hAmp = new TH1D*[NChannel];
@@ -67,7 +68,7 @@ bool LAPPDPlotWaveForms::Initialise(std::string configfile, DataModel &data){
       TimeName+=i;
       hTime[i] = new TH1D(TimeName,TimeName,10000,0.,100000.);
     }*/
-    
+
   return true;
 }
 
@@ -76,53 +77,77 @@ bool LAPPDPlotWaveForms::Execute(){
 
     // get raw lappd data
     std::map<unsigned long,vector<Waveform<double>>> lappddata;
-    
+
     //m_data->Stores["ANNIEEvent"]->Get("RawLAPPDData",rawlappddata);
     m_data->Stores["ANNIEEvent"]->Get(InputWavLabel,lappddata);
-    
-    
-    
+
+    bool T0signalInWindow;
+    m_data->Stores["ANNIEEvent"]->Get("T0signalInWindow",T0signalInWindow);
+    if(!T0signalInWindow) return true;
+
+    double totcharge;
+    m_data->Stores["ANNIEEvent"]->Get("TotCharge",totcharge);
+    PHD->Fill(totcharge);
+
+
     // loop over all channels
     std::map<unsigned long, vector<Waveform<double>>> :: iterator itr;
     for (itr = lappddata.begin(); itr != lappddata.end(); ++itr){
-        
-        int channelno = itr->first;
+
+        unsigned long channelno = itr->first;
         vector<Waveform<double>> Vwavs = itr->second;
-        
+
+        Channel* mychannel = _geom->GetChannel(channelno);
+        //figure out the stripline number
+        int stripno = mychannel->GetStripNum();
+        //figure out the side of the stripline
+        int stripside = mychannel->GetStripSide();
+
         for(int i=0; i<Vwavs.size(); i++){
             Waveform<double> bwav = Vwavs.at(i);
-            
+
             int nbins = bwav.GetSamples()->size();
             //cout<<"IN PLOT WAVES "<<channelno<<" "<<nbins<<endl;
             double starttime=0.;
             double endtime = starttime + ((double)nbins)*100.;
-            
+
             TString hname;
-            hname+="wav_ch";
-            hname+=channelno;
-            hname+="_wav";
-            hname+=i;
-            hname+="_evt";
-            hname+=miter;
+
+            if(SaveByChannel){
+              hname+="wav_ch";
+              hname+=channelno;
+              hname+="_wav";
+              hname+=i;
+              hname+="_evt";
+              hname+=miter;
+            } else{
+              hname+="wav_strip_";
+              hname+=stripno;
+              hname+="_";
+              if(stripside==0) hname+="L";
+              else hname+="R";
+              hname+="_evt";
+              hname+=miter;
+            }
 
             TH1D* hwav = new TH1D(hname,hname,nbins,starttime,endtime);
- 
+
             for(int i=0; i<nbins; i++){
               hwav->SetBinContent(i+1,-bwav.GetSamples()->at(i));
             }
-            
+
             mtf->cd("wavs");
             if(miter<NHistos) { hwav->Write(); } //cout<<"WRITTEN!"<<endl; }
             delete hwav;
 
-            
+
         }
     }
-    
-    
+
+
     miter++;
-    
-    
+
+
   return true;
 }
 
@@ -130,8 +155,9 @@ bool LAPPDPlotWaveForms::Execute(){
 bool LAPPDPlotWaveForms::Finalise(){
 
     mtf->cd();
+    mtf->Write();
     mtf->Close();
     delete mtf;
-    
+
   return true;
 }
