@@ -101,7 +101,6 @@ if (tool=="LAPPDCluster") ret=new LAPPDCluster;
 if (tool=="PSECReadIn") ret=new PSECReadIn;
 if (tool=="LAPPDPlotWaveForms") ret=new LAPPDPlotWaveForms;
 if (tool=="LAPPDReorderData") ret=new LAPPDReorderData;
-if (tool=="LAPPDHitTree") ret=new LAPPDHitTree;
 if (tool=="LAPPDMakePeds") ret=new LAPPDMakePeds;
 if (tool=="LAPPDFindT0") ret=new LAPPDFindT0;
 return ret;
