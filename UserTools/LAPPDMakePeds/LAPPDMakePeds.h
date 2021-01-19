@@ -3,11 +3,13 @@
 
 #include <string>
 #include <iostream>
-
+#include <fstream>
 #include "Tool.h"
 #include "TH1.h"
 #include "TFile.h"
-
+#include "TString.h"
+#include "TF1.h"
+#include "TTree.h"
 
 
 /**
@@ -28,11 +30,11 @@ class LAPPDMakePeds: public Tool {
   bool Initialise(std::string configfile,DataModel &data); ///< Initialise Function for setting up Tool resources. @param configfile The path and name of the dynamic configuration file to read in. @param data A reference to the transient data class used to pass information between Tools.
   bool Execute(); ///< Execute function used to perform Tool purpose.
   bool Finalise(); ///< Finalise function used to clean up resources.
-
+  //TFile* pedrootfile;
 
  private:
 
-   std::map<unsigned long, TH1D>* pedhists;
+   std::map<unsigned long, vector<TH1D>>* pedhists;
 
    string InputWavLabel;
    string PedOutFname;
