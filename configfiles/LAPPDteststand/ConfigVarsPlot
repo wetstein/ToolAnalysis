@@ -10,3 +10,6 @@ SaveByChannel false
 PlotWavLabel AlignedLAPPDData
 outfile WaveForms_rawblsub.root
 NHistos 200
+SaveSingleStrip 0
+SingleStripNo 11
+TrigNo 1005
