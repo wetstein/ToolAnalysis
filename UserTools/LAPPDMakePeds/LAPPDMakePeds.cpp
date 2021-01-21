@@ -23,6 +23,7 @@ bool LAPPDMakePeds::Initialise(std::string configfile, DataModel &data){
 
   pedhists = new std::map<unsigned long, vector<TH1D>>;
   //pedrootfile = new TFile("PedHist.root","RECREATE");
+  eventcount=0;
 
   return true;
 }
@@ -33,8 +34,7 @@ bool LAPPDMakePeds::Execute(){
   // get raw lappd data
   std::map<unsigned long,vector<Waveform<double>>> lappddata;
 
-  cout<<"In MakePeds Execute"<<endl;
-
+  if(eventcount%10==0) cout<<"In MakePeds Execute, Event: "<<eventcount<<endl;
   //m_data->Stores["ANNIEEvent"]->Get("RawLAPPDData",rawlappddata);
   m_data->Stores["ANNIEEvent"]->Get(InputWavLabel,lappddata);
 
@@ -44,8 +44,8 @@ bool LAPPDMakePeds::Execute(){
   for (itr = lappddata.begin(); itr != lappddata.end(); ++itr){
       unsigned long channelNo = itr->first;
       vector<Waveform<double>> Vwavs = itr->second;
-      cout<< "Vwavs size "<< Vwavs.size()<<endl;
-      cout<<"Looping, on channel: "<<(int)channelNo<<endl;
+      //cout<< "Vwavs size "<< Vwavs.size()<<endl;
+      //cout<<"Looping, on channel: "<<(int)channelNo<<endl;
 
       Channel* mychannel = _geom->GetChannel(channelNo);
       //figure out the stripline number
@@ -57,7 +57,7 @@ bool LAPPDMakePeds::Execute(){
     if((pedhists->count(channelNo))==0)
     {
       firstevent=true;
-      cout<<"FIRST EVENT ON CHANNEL"<<endl;
+      //cout<<"FIRST EVENT ON CHANNEL"<<endl;
     }
 
 
@@ -94,18 +94,23 @@ bool LAPPDMakePeds::Execute(){
               (pedhists->find(channelNo))->second.push_back(thepeds);
             }
             (pedhists->find(channelNo))->second.at(j).Fill(sampleval);
-            cout<<"sample added_"<<pedhists->find(channelNo)->second.at(j).GetMean()<< endl;
+            //cout<<"sample added_"<<pedhists->find(channelNo)->second.at(j).GetMean()<< endl;
           }
 
         }
       }
 
-
+  eventcount++;
   return true;
 }
 
 
 bool LAPPDMakePeds::Finalise(){
+
+  int PlotPedChannel;
+  TFile ptf("pedhists.root","RECREATE");
+  m_variables.Get("PlotPedChannel",PlotPedChannel);
+
 
   string a, b, fileName1, fileName2;
   vector<string> datavalues1;
@@ -132,12 +137,18 @@ bool LAPPDMakePeds::Finalise(){
     }
     for(int i=0; i<nhists; i++)
     {
+
+      if(PlotPedChannel==(int)channelno){ptf.cd();   itr->second.at(i).Write();}
       TF1 *f1 = new TF1("f1","gaus",0,1000);
       double max = itr->second.at(i).GetMaximum();
       double mean =  itr->second.at(i).GetMean();
       double rms =  itr->second.at(i).GetRMS();
       f1->SetParameters(max,mean,rms);
       hists.at(i).Fit("f1","Q");
+
+      double justmean = (itr->second).at(i).GetMean();
+      double gausmean = f1->GetParameters()[1];
+      if(fabs(gausmean-justmean)>10) cout<<"Means are different! "<<channelno<<" "<<i<<" "<<gausmean<<" "<<justmean<<endl;
       //cout<<"avg ped value= "<<(itr->second).at(i).GetMean()<<endl;
       //cout<<"avg ped value with gaussian"<<f1->GetParameters()[1]<<endl;
       //pedrootfile->cd();
@@ -190,6 +201,7 @@ bool LAPPDMakePeds::Finalise(){
     txtOut << datavalues2.at(j)<<endl;
   }
 //  pedhists->clear();
+  ptf.Close();
   txtOut.close();
 //  pedrootfile->Close();
   return true;
