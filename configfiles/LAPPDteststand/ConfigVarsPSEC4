@@ -89,6 +89,9 @@ SaveByChannel false
 PlotWavLabel FiltLAPPDData
 outfile WaveForms_filt.root
 NHistos 200
+SaveSingleStrip 0
+SingleStripNo 11
+TrigNo 1005
 
 # LAPPDSave
 path ./testoutput
