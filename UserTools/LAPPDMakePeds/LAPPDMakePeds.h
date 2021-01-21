@@ -41,6 +41,7 @@ class LAPPDMakePeds: public Tool {
    int verbostiylevel;
    int NChannels;
    Geometry* _geom;
+   int eventcount;
 
 
 
