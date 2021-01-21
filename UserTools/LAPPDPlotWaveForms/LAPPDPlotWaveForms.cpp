@@ -19,11 +19,6 @@ bool LAPPDPlotWaveForms::Initialise(std::string configfile, DataModel &data){
     m_variables.Get("PlotWavLabel",IWL);
     InputWavLabel = IWL;
 
-    // setup the output files
-    TString OutFile = "lapptraces.root";     //default input file
-    m_variables.Get("outfile", OutFile);
-    mtf = new TFile(OutFile,"RECREATE");
-    mtf->mkdir("wavs");
     //tf->mkdir("filteredwavs");
     //tf->mkdir("blswavs");
 
@@ -42,6 +37,18 @@ bool LAPPDPlotWaveForms::Initialise(std::string configfile, DataModel &data){
     m_variables.Get("NHistos", NHistos);
     m_variables.Get("SampleSize",Deltat);
     m_variables.Get("SaveByChannel",SaveByChannel);
+    m_variables.Get("SaveSingleStrip",SaveSingleStrip);
+    m_variables.Get("SingleStripNo",psno);
+    m_variables.Get("TrigNo",trigno);
+
+
+    // setup the output files
+    TString OutFile = "lapptraces.root";     //default input file
+    m_variables.Get("outfile", OutFile);
+    mtf = new TFile(OutFile,"RECREATE");
+    if(!SaveSingleStrip) mtf->mkdir("wavs");
+
+    cout<<"SAVE SINGLE STRIP: "<<SaveSingleStrip<<" "<<psno<<" "<<trigno<<endl;
 
     PHD = new TH1D("PHD","PHD",1000,-1e5,1e7);
 
@@ -113,39 +120,72 @@ bool LAPPDPlotWaveForms::Execute(){
 
             TString hname;
 
-            if(SaveByChannel){
-              hname+="wav_ch";
-              hname+=channelno;
-              hname+="_wav";
-              hname+=i;
-              hname+="_evt";
-              hname+=miter;
+            TH1D* hwav;
+
+            if(!SaveSingleStrip){
+
+              if(SaveByChannel){
+                hname+="wav_ch";
+                hname+=channelno;
+                hname+="_wav";
+                hname+=i;
+                hname+="_evt";
+                hname+=miter;
+              } else{
+                hname+="wav_strip_";
+                hname+=stripno;
+                hname+="_";
+                if(stripside==0) hname+="L";
+                else hname+="R";
+                hname+="_evt";
+                hname+=miter;
+              }
+
+              hwav = new TH1D(hname,hname,nbins,starttime,endtime);
+
+              for(int i=0; i<nbins; i++){
+                hwav->SetBinContent(i+1,-bwav.GetSamples()->at(i));
+              }
+
+              mtf->cd("wavs");
+              if(miter<NHistos) hwav->Write();
+              delete hwav;
             } else{
-              hname+="wav_strip_";
-              hname+=stripno;
-              hname+="_";
-              if(stripside==0) hname+="L";
-              else hname+="R";
-              hname+="_evt";
-              hname+=miter;
+
+              mtf->cd();
+              if(stripno==psno){
+                hname+="wav_strip_";
+                hname+=stripno;
+                hname+="_";
+                if(stripside==0) hname+="L";
+                else hname+="R";
+                hname+="_evt";
+                hname+=miter;
+                hwav = new TH1D(hname,hname,nbins,starttime,endtime);
+                for(int i=0; i<nbins; i++){
+                  hwav->SetBinContent(i+1,-bwav.GetSamples()->at(i));
+                }
+                if(miter<NHistos) hwav->Write();
+                delete hwav;
+              }
+
+              if((int)channelno==trigno){
+                hname+="trig_";
+                hname+=miter;
+                hwav = new TH1D(hname,hname,nbins,starttime,endtime);
+                for(int i=0; i<nbins; i++){
+                  hwav->SetBinContent(i+1,-bwav.GetSamples()->at(i));
+                }
+                if(miter<NHistos) hwav->Write();
+                delete hwav;
+              }
             }
-
-            TH1D* hwav = new TH1D(hname,hname,nbins,starttime,endtime);
-
-            for(int i=0; i<nbins; i++){
-              hwav->SetBinContent(i+1,-bwav.GetSamples()->at(i));
-            }
-
-            mtf->cd("wavs");
-            if(miter<NHistos) { hwav->Write(); } //cout<<"WRITTEN!"<<endl; }
-            delete hwav;
+          } //cout<<"WRITTEN!"<<endl; }
+      }
 
 
-        }
-    }
 
-
-    miter++;
+  miter++;
 
 
   return true;
