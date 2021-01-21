@@ -16,7 +16,7 @@ TankPMTGeoFile ./configfiles/LoadGeometry/FullTankPMTGeometry.csv
 PSECReadInVerbosity 0
 RawDataOutpuWavLabel  RawLAPPDData
 #PSECinputfile ../Data/2020-12-19/scan8x8_20201219/ALLData_5k_X_10_Y_10.txt
-PSECinputfile ../Data/Pedestal_boards_20210115/Data_20211501_142254.txt
+PSECinputfile ../Data/2021-01-15/Pedestal_boards_20210115/all.txt
 #Data_20201712_174129_X_-15._Y_-75.txt
 DoPedSubtraction 0
 Nboards 2
@@ -34,9 +34,13 @@ HiBLfitrange  41;
 
 #LAPPDMakePeds
 PedWavLabel RawLAPPDData
+PlotPedChannel  35
 
 #LAPPDPlotWaveForms
 SaveByChannel false
 PlotWavLabel RawLAPPDData
 outfile WaveForms_raw.root
 NHistos 200
+SaveSingleStrip 0
+SingleStripNo 11
+TrigNo 1005
