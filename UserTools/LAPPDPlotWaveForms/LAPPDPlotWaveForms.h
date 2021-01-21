@@ -53,7 +53,9 @@ class LAPPDPlotWaveForms: public Tool {
     bool isSim;
     bool isBLsub;
     bool SaveByChannel;
-    int chno;
+    bool SaveSingleStrip;
+    int psno;
+    int trigno;
     TH1D* PHD;
     Geometry* _geom;
 
