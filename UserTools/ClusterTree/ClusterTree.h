@@ -29,17 +29,54 @@ class ClusterTree: public Tool {
   TFile* nottf;
   TTree* fMyTree;   //!pointer to the Tree
 
+  bool simpleClusters;
+  string CFDClusterLabel;
+  string SimpleClusterLabel;
+  Geometry* _geom;
+
 
   // declare the tree variables
 
   Int_t         NHits;
-  Double_t      hQ[40];  
-  Double_t      hT[40];  
+
+  // NEW!!!
+  Int_t         WraparoundBin;
+  Int_t         T0Bin;
+  Int_t         QualityVar;
+  Double_t      TrigDeltaT;
+  Double_t      PulseHeight;
+  // END NEW!!!
+
+  Double_t      hQ[40];
+  Double_t      hT[40];
   double_t      hxpar[40];
   double_t      hxperp[40];
   double_t      htime[40];
   double_t      hdeltime[40];
   double_t      hvpeak[40];
+
+  //NEW!!!
+  Int_t         NHits_simp;
+  Double_t      hQ_simp[40];
+  Double_t      hT_simp[40];
+  Double_t      htime_simp[40];
+  double_t      hxpar_simp[40];
+  double_t      hxperp_simp[40];
+
+  Int_t         Npulses_cfd;
+  Double_t      pulsestart_cfd[40];
+  Int_t        pulsestrip_cfd[40];
+  Int_t         pulseside_cfd[40];
+
+  Int_t         Npulses_simp;
+  Double_t      pulsestart_simp[40];
+  Double_t      pulseend_simp[40];
+  Double_t      pulseamp_simp[40];
+  Double_t      pulseQ_simp[40];
+  Double_t      pulsepeakbin_simp[40];
+  Int_t         pulsestrip_simp[40];
+  Int_t         pulseside_simp[40];
+
 
  private:
 
