@@ -35,6 +35,7 @@ class LAPPDCluster: public Tool {
 
     Geometry* _geom;
 
+    string HitOutLabel;
     string SimpleClusterLabel;
     string CFDClusterLabel;
     int ClusterVerbosity;
