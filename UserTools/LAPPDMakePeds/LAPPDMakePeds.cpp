@@ -89,11 +89,11 @@ bool LAPPDMakePeds::Execute(){
               hname+=i;
               hname+="_";
               hname+= j;
-              TH1D thepeds(hname,hname,1000,0,1000);
+              TH1D thepeds(hname,hname,1000,0,3000);
             //  cout<<"new TH1D"<<endl;
               (pedhists->find(channelNo))->second.push_back(thepeds);
             }
-            (pedhists->find(channelNo))->second.at(j).Fill(sampleval);
+            (pedhists->find(channelNo))->second.at(j).Fill(sampleval/0.3);
             //cout<<"sample added_"<<pedhists->find(channelNo)->second.at(j).GetMean()<< endl;
           }
 
@@ -139,12 +139,15 @@ bool LAPPDMakePeds::Finalise(){
     {
 
       if(PlotPedChannel==(int)channelno){ptf.cd();   itr->second.at(i).Write();}
-      TF1 *f1 = new TF1("f1","gaus",0,1000);
+      TF1 *f1 = new TF1("f1","gaus",0,3000);
       double max = itr->second.at(i).GetMaximum();
       double mean =  itr->second.at(i).GetMean();
+      double maxbin = itr->second.at(i).GetMaximumBin();
+      double maxloc = itr->second.at(i).GetBinCenter(maxbin);
       double rms =  itr->second.at(i).GetRMS();
-      f1->SetParameters(max,mean,rms);
-      hists.at(i).Fit("f1","Q");
+      if(rms>5.) rms = 3.;
+      f1->SetParameters(max,maxloc,rms);
+      hists.at(i).Fit("f1","Q","",maxloc-40,maxloc+40);
 
       double justmean = (itr->second).at(i).GetMean();
       double gausmean = f1->GetParameters()[1];
