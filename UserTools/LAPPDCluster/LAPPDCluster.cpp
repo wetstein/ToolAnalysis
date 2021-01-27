@@ -20,12 +20,15 @@ bool LAPPDCluster::Initialise(std::string configfile, DataModel &data){
     SimpleClusterLabel = SCL;
     TString CFDCL;
     m_variables.Get("CFDClusterLabel",CFDCL);
-      //cout<<"GKLDAJGAFSFD"<<CL<<endl;
     CFDClusterLabel = CFDCL;
-    
+
+    TString HOL;
+    m_variables.Get("HitOutLabel",HOL);
+    HitOutLabel = HOL;
+
     m_variables.Get("ClusterVerbosity",ClusterVerbosity);
 
-    
+
     //cout<<ClusterLabel<<endl;
 
   return true;
@@ -47,7 +50,7 @@ bool LAPPDCluster::Execute(){
     m_data->Stores["ANNIEEvent"]->Get(SimpleClusterLabel,RecoLAPPDPulses);
       //cout<<"excuse me?"<<endl;
   }
-  
+
   //cout<<RecoLAPPDPulses.size()<<endl;
   //m_data->Stores["ANNIEEvent"]->Get("RecoLAPPDPulses",RecoLAPPDPulses);
     //cout<<"We got "<< RecoLAPPDPulses.size()<< " Pulses" << endl;
@@ -257,7 +260,9 @@ bool LAPPDCluster::Execute(){
 
   }
   if(ClusterVerbosity>0) cout << "Ending LAPPDCluster: " << Hits.size()<< endl;
-  m_data->Stores["ANNIEEvent"]->Set("Clusters",Hits);
+  //m_data->Stores["ANNIEEvent"]->Set("Clusters",Hits);
+  m_data->Stores["ANNIEEvent"]->Set(HitOutLabel,Hits);
+
   return true;
 }
 
