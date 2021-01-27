@@ -54,6 +54,7 @@ class LAPPDPlotWaveForms: public Tool {
     bool isBLsub;
     bool SaveByChannel;
     bool SaveSingleStrip;
+    bool requireT0signal;
     int psno;
     int trigno;
     TH1D* PHD;
