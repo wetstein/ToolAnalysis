@@ -165,7 +165,7 @@ bool LAPPDcfd::Finalise(){
 double	LAPPDcfd::CFD_Discriminator1(std::vector<double>* trace, LAPPDPulse pulse) {
 
   double deltaT;
-  m_data->Stores["ANNIEEvent"]->Set("deltaT",deltaT);
+  m_data->Stores["ANNIEEvent"]->Get("deltaT",deltaT);
 
   double amp = pulse.GetPeak();
   double time = 0;
@@ -215,7 +215,7 @@ double	LAPPDcfd::CFD_Discriminator1(std::vector<double>* trace, LAPPDPulse pulse
     xlow = xmid;
   }
 
-  time = xlow + deltaT;
+  time = xlow;
   delete hwav;
   delete hwav_range;
 	return time;
