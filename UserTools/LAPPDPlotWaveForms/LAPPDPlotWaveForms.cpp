@@ -40,6 +40,7 @@ bool LAPPDPlotWaveForms::Initialise(std::string configfile, DataModel &data){
     m_variables.Get("SaveSingleStrip",SaveSingleStrip);
     m_variables.Get("SingleStripNo",psno);
     m_variables.Get("TrigNo",trigno);
+    m_variables.Get("requireT0signal",requireT0signal);
 
 
     // setup the output files
@@ -90,7 +91,7 @@ bool LAPPDPlotWaveForms::Execute(){
 
     bool T0signalInWindow;
     m_data->Stores["ANNIEEvent"]->Get("T0signalInWindow",T0signalInWindow);
-    if(!T0signalInWindow) return true;
+    if(requireT0signal && !T0signalInWindow) return true;
 
     double totcharge;
     m_data->Stores["ANNIEEvent"]->Get("TotCharge",totcharge);
