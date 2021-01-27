@@ -55,7 +55,9 @@ bool LAPPDFindT0::Execute(){
   double thetime = Tfit(bwav.GetSamples());
   int switchbit = (int)(thetime/100.);
   deltaT = thetime - (100.*(double)switchbit);
+  int Qvar=0;
   if( (switchbit>=trigearlycut) && (switchbit<=triglatecut) ) T0signalInWindow = true;
+
   if(FindT0VerbosityLevel>0) cout<<"Done finding the time, switchbit:" << switchbit << " , deltaT: "<<deltaT<<" , inwindow: "<<T0signalInWindow<<endl;
 
 
@@ -97,6 +99,7 @@ bool LAPPDFindT0::Execute(){
   m_data->Stores["ANNIEEvent"]->Set(OutputWavLabel,reordereddata);
   m_data->Stores["ANNIEEvent"]->Set("deltaT",deltaT);
   m_data->Stores["ANNIEEvent"]->Set("T0signalInWindow",T0signalInWindow);
+  m_data->Stores["ANNIEEvent"]->Set("T0Bin",switchbit);
 
 
   return true;
