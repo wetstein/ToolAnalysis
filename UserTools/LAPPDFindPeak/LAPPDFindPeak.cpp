@@ -149,6 +149,7 @@ std::vector<LAPPDPulse> LAPPDFindPeak::FindPulses_TOT(std::vector<double> *theWa
 
   int npeaks=0;
   int endbin=0;
+  int peakbin=0;
   double Q=0.;
   double peak=0.;
   double low=0.;
@@ -172,7 +173,7 @@ std::vector<LAPPDPulse> LAPPDFindPeak::FindPulses_TOT(std::vector<double> *theWa
 		if(pvol>threshold) {
            // cout<<theWav->at(i)<<endl;
             length++;
-            if(pvol>peak) peak = pvol;
+            if(pvol>peak) {peak = pvol; peakbin=i;}
             Q+=(theWav->at(i));
             if(!pulsestarted) low=(double)i;
             pulsestarted=true;
@@ -183,7 +184,7 @@ std::vector<LAPPDPulse> LAPPDFindPeak::FindPulses_TOT(std::vector<double> *theWa
 			else {
                 npeaks++; length = 0; hi=(double)i;
                 tc= (low * Deltat)/1000.;
-                LAPPDPulse apulse(0,0,tc,Q,peak,low,hi);
+                LAPPDPulse apulse(0,peakbin,tc,Q,peak,low,hi);
                 if(FindPeakVerbosity>2) cout<<"pulse parameters:  t="<<tc<<" Q="<<Q<<" peak="<<peak<<" low="<<low<<" hi="<<hi<<endl;
                 thepulses.push_back(apulse);
                 pulsestarted=false;
