@@ -26,18 +26,21 @@ Pedinputfile2 ../Data/PEDS_ACDC_board1.txt
 #LAPPDReorderData
 ReorderInputWavLabel RawLAPPDData
 ReorderOutputWavLabel LAPPDWaveforms
+DelayOffset 0
 
 #LAPPDBaselineSubtract
 BLSInputWavLabel LAPPDWaveforms
 LowBLfitrange 1;
 HiBLfitrange  41;
+BLSOutputWavLabel BLsubtractedLAPPDData
 
 #LAPPDMakePeds
 PedWavLabel RawLAPPDData
-PlotPedChannel  35
+PlotPedChannel  5
 
 #LAPPDPlotWaveForms
-SaveByChannel false
+requireT0signal 1
+SaveByChannel 0
 PlotWavLabel RawLAPPDData
 outfile WaveForms_raw.root
 NHistos 200
