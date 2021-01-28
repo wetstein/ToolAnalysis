@@ -12,19 +12,10 @@ DetectorGeoFile ./configfiles/LoadGeometry/DetectorGeometrySpecs.csv
 LAPPDGeoFile ./configfiles/LAPPDteststand/LAPPDGeometry.csv
 TankPMTGeoFile ./configfiles/LoadGeometry/FullTankPMTGeometry.csv
 
-# LAPPDSim
-SimInput  ./UserTools/LAPPDSim/pulsecharacteristics.root
-
 #PSECReadIn
 PSECReadInVerbosity 0
 RawDataOutpuWavLabel  RawLAPPDData
-#PSECinputfile ../Data/2020-12-19/scan8x8_20201219/ALLData_5k_X_10_Y_10.txt
-#PSECinputfile ../Data/2020-12-29/975V_perMCP_trig_sparechannel/all.txt
-#PSECinputfile ../Data/2020-01-05/975V_perMCP_trig_sparechannel_20210105/all.txt
 PSECinputfile ../Data/2021-01-07/975V_perMCP_trigspare/all.txt
-
-975V_perMCP_trig_sparechannel_20210105/all.txt
-#Data_20201712_174129_X_-15._Y_-75.txt
 DoPedSubtraction 1
 Nboards 2
 Pedinputfile1 PEDS_ACDC_board0.txt
@@ -38,23 +29,25 @@ DelayOffset 0
 #LAPPDBaselineSubtract
 BLSInputWavLabel LAPPDWaveforms
 LowBLfitrange 2;
-HiBLfitrange  27;
+HiBLfitrange  19;
+BLSOutputWavLabel BLsubtractedLAPPDData
 
 #LAPPDFindT0
 FindT0Verbosity 0
 FindT0InputWavLabel BLsubtractedLAPPDData
-FindT0OutputWavLabel AlignedLAPPDData
 TrigEarlyCut 27
 TrigLateCut 40
 T0channelNo 1005
 T0signalmax 100.
 T0signalthreshold 40.
 T0offset  58
+FindT0OutputWavLabel AlignedLAPPDData
 
 #LAPPDFilter
 RawFilterInputWavLabel LAPPDWaveforms
 #BLSFilterInputWavLabel BLsubtractedLAPPDData
-BLSFilterInputWavLabel AlignedLAPPDData
+#BLSFilterInputWavLabel AlignedLAPPDData
+BLSFilterInputWavLabel ABLSLAPPDData
 doFilter false
 CutoffFrequency 500000000
 
@@ -70,7 +63,6 @@ IntegHi 9000
 FindPeakVerbosity 0
 FiltPeakInputWavLabel FiltLAPPDData
 RawPeakInputWavLabel LAPPDWaveforms
-#BLSPeakInputWavLabel BLsubtractedLAPPDData
 BLSPeakInputWavLabel AlignedLAPPDData
 TotThreshold 3.0
 MinimumTot 1000.
@@ -80,11 +72,11 @@ Deltat 100.
 CFDVerbosity 0
 FiltCFDInputWavLabel FiltLAPPDData
 RawCFDInputWavLabel LAPPDWaveforms
-#BLSCFDInputWavLabel BLsubtractedLAPPDData
 BLSCFDInputWavLabel AlignedLAPPDData
 Fraction_CFD 0.15
 
 #LAPPDPlotWaveForms
+requireT0signal 1
 SaveByChannel false
 PlotWavLabel FiltLAPPDData
 outfile WaveForms_filt.root
@@ -96,15 +88,12 @@ TrigNo 1005
 # LAPPDSave
 path ./testoutput
 
-# LAPPDSaveROOT
-#outfile SimTest.root
-#outfile ./testout.root
-#NHistos 10
-
 #LAPPDCluster
 ClusterVerbosity  0
 SimpleClusterLabel SimpleRecoLAPPDPulses
 CFDClusterLabel CFDRecoLAPPDPulses
+HitOutLabel Clusters
 
 #LAPPDClusterTree
 ClusterTreeVerbosity  0
+getSimpleClusters 1
