@@ -62,7 +62,7 @@ bool PSECReadIn::Initialise(std::string configfile, DataModel &data){
 
   eventNo=0; //event number
 
-  cout<<"PEDSIZES: "<<PedestalValues->size()<<" "<<PedestalValues->at(0).size()<<" "<<PedestalValues->at(4).at(5)<<endl;
+  if(DoPedSubtract==1) cout<<"PEDSIZES: "<<PedestalValues->size()<<" "<<PedestalValues->at(0).size()<<" "<<PedestalValues->at(4).at(5)<<endl;
 
   return true;
 }
