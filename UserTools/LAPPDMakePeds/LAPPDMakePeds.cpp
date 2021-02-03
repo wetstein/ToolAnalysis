@@ -34,7 +34,7 @@ bool LAPPDMakePeds::Execute(){
   // get raw lappd data
   std::map<unsigned long,vector<Waveform<double>>> lappddata;
 
-  if(eventcount%10==0) cout<<"In MakePeds Execute, Event: "<<eventcount<<endl;
+  if(eventcount%100==0) cout<<"In MakePeds Execute, Event: "<<eventcount<<endl;
   //m_data->Stores["ANNIEEvent"]->Get("RawLAPPDData",rawlappddata);
   m_data->Stores["ANNIEEvent"]->Get(InputWavLabel,lappddata);
 
@@ -111,7 +111,6 @@ bool LAPPDMakePeds::Finalise(){
   TFile ptf("pedhists.root","RECREATE");
   m_variables.Get("PlotPedChannel",PlotPedChannel);
 
-
   string a, b, fileName1, fileName2;
   vector<string> datavalues1;
   vector<string> datavalues2;
@@ -124,13 +123,55 @@ bool LAPPDMakePeds::Finalise(){
   ofstream txtOut;
   txtOut.open (fileName1);
   bool firstchannel=true;
+
+/*
+  TH1D* means = new TH1D("means","means",60,-0.5,59.5);
+  TH1D* rmss = new TH1D("rmss","rmss",60,-0.5,59.5);
+  TH1D* mus = new TH1D("mus","mus",60,-0.5,59.5);
+  TH1D* sigmas = new TH1D("sigmas","sigmas",60,-0.5,59.5);
+*/
+
+  TH1D** means = new TH1D*[pedhists->size()];
+  TH1D** rmss = new TH1D*[pedhists->size()];
+  TH1D** mus = new TH1D*[pedhists->size()];
+  TH1D** sigmas = new TH1D*[pedhists->size()];
+
+/*
+  ("means","means",60,-0.5,59.5);
+  TH1D** rmss = new TH1D("rmss","rmss",60,-0.5,59.5);
+  TH1D** mus = new TH1D("mus","mus",60,-0.5,59.5);
+  TH1D** sigmas = new TH1D("sigmas","sigmas",60,-0.5,59.5);
+*/
+
   std::map<unsigned long, vector<TH1D>> :: iterator itr;
+  int ccount=0;
   for (itr = pedhists->begin(); itr != pedhists->end(); ++itr)
   {
     unsigned long channelno = itr-> first;
     vector<TH1D> hists = itr->second;
     int nhists = hists.size();
     cout<<"CHANNEL NUMBER"<<channelno<<endl;
+
+    TString hmeanname;
+    hmeanname+="means_";
+    hmeanname+=ccount;
+    means[ccount] = new TH1D(hmeanname,hmeanname,256,-0.5,255.5);
+
+    TString hrmsname;
+    hrmsname+="rmss_";
+    hrmsname+=ccount;
+    rmss[ccount] = new TH1D(hrmsname,hrmsname,256,-0.5,255.5);
+
+    TString hmuname;
+    hmuname+="mus_";
+    hmuname+=ccount;
+    mus[ccount] = new TH1D(hmuname,hmuname,256,-0.5,255.5);
+
+    TString hsigname;
+    hsigname+="sigmas_";
+    hsigname+=ccount;
+    sigmas[ccount] = new TH1D(hsigname,hsigname,256,-0.5,255.5);
+
     if (channelno==30)
     {
       firstchannel=true;
@@ -148,15 +189,27 @@ bool LAPPDMakePeds::Finalise(){
       if(rms>5.) rms = 3.;
       f1->SetParameters(max,maxloc,rms);
       hists.at(i).Fit("f1","Q","",maxloc-40,maxloc+40);
+      double mu = f1->GetParameters()[1];
+      double gaussigma = f1->GetParameters()[2];
 
-      double justmean = (itr->second).at(i).GetMean();
-      double gausmean = f1->GetParameters()[1];
-      if(fabs(gausmean-justmean)>10) cout<<"Means are different! "<<channelno<<" "<<i<<" "<<gausmean<<" "<<justmean<<endl;
+      means[ccount]->SetBinContent(i,mean);
+      rmss[ccount]->SetBinContent(i,rms);
+      mus[ccount]->SetBinContent(i,mu);
+      sigmas[ccount]->SetBinContent(i,gaussigma);
+
+
+      if(fabs(mu-mean)>10) cout<<"Means are different! "<<channelno<<" "<<i<<" "<<mu<<" "<<mean<<endl;
       //cout<<"avg ped value= "<<(itr->second).at(i).GetMean()<<endl;
       //cout<<"avg ped value with gaussian"<<f1->GetParameters()[1]<<endl;
       //pedrootfile->cd();
       //hists.at(i).Write();
-      double mu = f1->GetParameters()[1];
+/*
+      means->SetBinContent((int)channelno,justmean);
+      rmss->SetBinContent((int)channelno,rms);
+      mus->SetBinContent((int)channelno,gausmean);
+      sigmas->SetBinContent((int)channelno,gaussigma);
+*/
+
       string mutext = std::to_string(mu);
       if (channelno<30)
       {
@@ -190,6 +243,7 @@ bool LAPPDMakePeds::Finalise(){
       }
     }
     firstchannel=false;
+    ccount++;
   }
   cout<<datavalues1.size()<<endl;
   cout<<datavalues2.size()<<endl;
@@ -203,6 +257,21 @@ bool LAPPDMakePeds::Finalise(){
   {
     txtOut << datavalues2.at(j)<<endl;
   }
+
+  for (int j=0; j<ccount; j++)
+  {
+    means[j]->Write();
+    rmss[j]->Write();
+    mus[j]->Write();
+    sigmas[j]->Write();
+  }
+
+/*
+  means->Write();
+  rmss->Write();
+  mus->Write();
+  sigmas->Write();
+*/
 //  pedhists->clear();
   ptf.Close();
   txtOut.close();
