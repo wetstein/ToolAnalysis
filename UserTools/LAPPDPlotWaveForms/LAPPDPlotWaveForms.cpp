@@ -91,7 +91,10 @@ bool LAPPDPlotWaveForms::Execute(){
 
     bool T0signalInWindow;
     m_data->Stores["ANNIEEvent"]->Get("T0signalInWindow",T0signalInWindow);
-    if(requireT0signal && !T0signalInWindow) return true;
+    if(requireT0signal && !T0signalInWindow) {
+    	miter++;
+    	return true;
+    }
 
     double totcharge;
     m_data->Stores["ANNIEEvent"]->Get("TotCharge",totcharge);

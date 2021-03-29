@@ -42,7 +42,8 @@ bool LAPPDIntegratePulse::Execute(){
 
   // get raw lappd data
   std::map<unsigned long,vector<Waveform<double>>> lappddata;
-  bool testval =  m_data->Stores["ANNIEEvent"]->Get("BLsubtractedLAPPDData",lappddata);
+  //bool testval =  m_data->Stores["ANNIEEvent"]->Get("BLsubtractedLAPPDData",lappddata);
+  bool testval =  m_data->Stores["ANNIEEvent"]->Get("ABLSLAPPDData",lappddata);
 
   std::map<int,vector<double>> thecharge;
   map <unsigned long, vector<Waveform<double>>> :: iterator itr;
@@ -108,7 +109,7 @@ double LAPPDIntegratePulse::CalcIntegral(Waveform<double> hwav, double lowR, dou
 
   if( (lowb>=0) && (hib<hwav.GetSamples()->size()) ){
     for(int i=lowb; i<hib; i++){
-      tQ+=((-hwav.GetSample(i))*Deltat);
+      tQ+=((hwav.GetSample(i))*Deltat);
     }
   } else std::cout<<"OUT OF RANGE!!!!";
 
